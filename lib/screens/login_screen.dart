@@ -1,8 +1,9 @@
 import 'package:chat_app/screens/background.dart';
-import 'package:chat_app/screens/constants.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../components/roundedButton.dart';
+import '../constants.dart';
 
 class LoginScreen extends StatefulWidget {
   static String id = 'login_screen';
@@ -11,6 +12,9 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final _auth = FirebaseAuth.instance;
+  late var email;
+  late var password;
   @override
   Widget build(BuildContext context) {
     return CustomBackground(
@@ -30,25 +34,31 @@ class _LoginScreenState extends State<LoginScreen> {
             SizedBox(
               height: 48.0,
             ),
-            TextField(
-              onChanged: (value) {
-                //Do something with the user input.
-              },
-              decoration: kTextFieldDecoration.copyWith(
-                  hintText: 'Enter your email'
-              ),
-            ),
-            SizedBox(
-              height: 8.0,
-            ),
-            TextField(
-              onChanged: (value) {
-                //Do something with the user input.
-              },
-              decoration: kTextFieldDecoration.copyWith(
-                hintText: 'Enter your password'
-              ),
-            ),
+        TextField(
+          keyboardType: TextInputType.emailAddress,
+          textAlign: TextAlign.center,
+          onChanged: (value) {
+            email = value;
+          },
+          style: kNameTextStyle,
+          decoration: kTextFieldDecoration.copyWith(
+              hintText: 'Enter your email'
+          ),
+        ),
+        SizedBox(
+          height: 8.0,
+        ),
+        TextField(
+          obscureText: true,
+          textAlign: TextAlign.center,
+          onChanged: (value) {
+            password = value;
+          },
+          style: kNameTextStyle,
+          decoration: kTextFieldDecoration.copyWith(
+              hintText: 'Enter your password'
+          ),
+        ),
             SizedBox(
               height: 24.0,
             ),
@@ -56,7 +66,12 @@ class _LoginScreenState extends State<LoginScreen> {
               title: 'Log in',
               color: Colors.lightBlueAccent,
               onPress: (){
-                //
+                try {
+                  final user = _auth.signInWithEmailAndPassword(email: email, password: password);
+
+                } catch (e) {
+                  print(e);
+                }
               },
             )
           ],

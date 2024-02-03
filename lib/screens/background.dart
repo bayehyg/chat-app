@@ -14,9 +14,8 @@ class CustomBackground extends StatelessWidget {
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
-                  image: AssetImage('images/background1.avif'),
+                  image: AssetImage('images/background.jpg'),
                   fit: BoxFit.cover,
-                  colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.5), BlendMode.darken)
               ),
             ),
           ),

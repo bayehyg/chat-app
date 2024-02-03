@@ -1,10 +1,10 @@
 import 'package:chat_app/screens/background.dart';
-import 'package:chat_app/screens/constants.dart';
 import 'package:chat_app/screens/login_screen.dart';
 import 'package:chat_app/screens/registration_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../components/roundedButton.dart';
+import '../constants.dart';
 
 class WelcomeScreen extends StatefulWidget {
   static String id = 'welcome_screen';
@@ -54,7 +54,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                 ),
                 Text(
                   ' Flash Chat',
-                  style: kFlashChatTextStyle,
+                  style: kLogoTextStyle,
                 ),
               ],
             ),
