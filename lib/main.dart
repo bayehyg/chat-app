@@ -1,3 +1,4 @@
+import 'package:chat_app/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:chat_app/screens/welcome_screen.dart';
 import 'package:chat_app/screens/login_screen.dart';
@@ -6,49 +7,23 @@ import 'package:chat_app/screens/chat_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
-
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  FutureBuilder(
-    // Pass the function that returns a Future
-    future: Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    ),
-    builder: (context, snapshot) {
-      // Check the connection state of the snapshot
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        // Return a loading indicator widget
-        return Center(
-          child: CircularProgressIndicator(),
-        );
-      } else if (snapshot.hasError) {
-        // Return an error widget
-        return Center(
-          child: Text('Something went wrong'),
-        );
-      } else {
-        // Return the widget that depends on Firebase
-        return FlashChat();
-      }
-    },
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(FlashChat());
+  runApp(const FlashChat());
 }
 
 class FlashChat extends StatelessWidget {
-
+  const FlashChat({super.key});
 
   @override
   Widget build(BuildContext context) {
-
     return MaterialApp(
-      theme: ThemeData.dark().copyWith(
-        textTheme: TextTheme(
-          bodyLarge: TextStyle(color: Colors.black54),
-        ),
-      ),
-      initialRoute: WelcomeScreen.id,
-      routes:  {
+      theme: kMainThemeData,
+      initialRoute: ChatScreen.id,
+      routes: {
         WelcomeScreen.id: (context) => WelcomeScreen(),
         LoginScreen.id: (context) => LoginScreen(),
         RegistrationScreen.id: (context) => RegistrationScreen(),
