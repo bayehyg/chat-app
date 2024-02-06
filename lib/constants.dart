@@ -2,20 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 final kMainThemeData = ThemeData.dark().copyWith(
+  bottomNavigationBarTheme: BottomNavigationBarThemeData(
+    unselectedIconTheme: IconThemeData(
+      size: 30,
+      color: Colors.grey.shade300
+    ),
+    backgroundColor: Color(0xFF1F1F1F),
+  ),
   buttonTheme: const ButtonThemeData(
       buttonColor: Color(0xff5727B6), textTheme: ButtonTextTheme.primary),
   appBarTheme: const AppBarTheme(
     iconTheme: IconThemeData(
-      color: Color(0XFF222222),
+      color: Color(0XFFffffff),
     ),
-    color: Color(0xffFFFFFF),
+    color: Color(0XFF1C1A1B),
     titleTextStyle: TextStyle(
       fontSize: 20,
       fontWeight: FontWeight.bold,
-      color: Color(0XFF222222),
+      color: Color(0XFFffffff),
     ),
   ),
-  scaffoldBackgroundColor: Color(0xffFFFFFF),
+  scaffoldBackgroundColor: Color(0XFF1C1A1B),
   textTheme: TextTheme(
     titleLarge: TextStyle(color: Color(0XFF222222)),
     bodyLarge: TextStyle(fontSize: 16, color: Colors.black),

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class CustomBottomNav extends StatefulWidget {
@@ -14,7 +15,7 @@ class _CustomBottomNavState extends State<CustomBottomNav> {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     return NavigationBar(
-      backgroundColor: Color(0xffF3EDF7),
+      backgroundColor: Color(0xFF1F1F1F),
       onDestinationSelected: (int index) {
         setState(() {
           currentPageIndex = index;
@@ -24,24 +25,18 @@ class _CustomBottomNavState extends State<CustomBottomNav> {
       selectedIndex: currentPageIndex,
       destinations: <Widget>[
         const NavigationDestination(
-          selectedIcon: Icon(
-            Icons.home,
-          ),
-          icon: Icon(
-            Icons.home_outlined,
-            color: Colors.black,
-            size: 30,
-          ),
+          selectedIcon: Icon(Icons.home, size: 30, color: Colors.white),
+          icon: Icon(Icons.home_outlined, size: 30, color: Colors.grey),
           label: 'Home',
         ),
         NavigationDestination(
-          selectedIcon: NavBadge(icon: Icons.notifications_sharp, label: '', color: Colors.grey.shade100),
-          icon: NavBadge(icon: Icons.notifications_sharp, label: '', color: Colors.black),
+          selectedIcon: NavBadge(icon: Icons.notifications_sharp, label: '', color: Colors.white),
+          icon: NavBadge(icon: Icons.notifications_sharp, label: '', color: Colors.grey),
           label: 'Notifications',
         ),
         NavigationDestination(
-          selectedIcon: NavBadge(icon: Icons.messenger_sharp, label: '2', color: Colors.grey.shade100),
-          icon: NavBadge(icon: Icons.messenger_sharp, label: '2', color: Colors.black),
+          selectedIcon: NavBadge(icon: CupertinoIcons.chat_bubble_2, label: '2', color: Colors.white),
+          icon: NavBadge(icon: CupertinoIcons.chat_bubble_2, label: '2', color: Colors.grey),
           label: 'Messages',
         ),
       ],
