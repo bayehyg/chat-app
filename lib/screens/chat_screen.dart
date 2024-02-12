@@ -1,15 +1,13 @@
 import 'package:chat_app/components/bottomNavigation.dart';
-import 'package:chat_app/components/chatCard.dart';
 import 'package:chat_app/components/custom_search_bar.dart';
-import 'package:chat_app/components/drawer.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:chat_app/firestore_adapter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:chat_app/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_chat_ui/flutter_chat_ui.dart';
-import 'package:random_avatar/random_avatar.dart';
 import '../components/conversations_card.dart';
+import 'package:intl/intl.dart';
+
 
 class ChatScreen extends StatefulWidget {
   static String id = 'chat_screen';
@@ -18,15 +16,25 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  final _firestore = FirebaseFirestore.instance;
+
   final _auth = FirebaseAuth.instance;
+  List items = [];
+  late FirestoreAdapter firestore;
   late User loggedInUser;
   late String message;
 
   @override
-  void initState() {
+  void initState()  {
     super.initState();
     getCurrentUser();
+    firestore = FirestoreAdapter(user: loggedInUser);
+    firestore.listenForChanges().listen((snapshot) {
+      setState(() {
+        if(snapshot.isNotEmpty){
+          items.addAll(snapshot);
+        }
+      });
+    });
   }
 
   void getCurrentUser() {
@@ -36,8 +44,43 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  Future<ListView> loadConversations() async {
+
+    items = await firestore.initialFetch();
+    final conversationList = ListView.builder(
+      reverse: true,
+      itemCount: items.length,
+      shrinkWrap: true,
+      padding: EdgeInsets.only(top: 16),
+      physics: NeverScrollableScrollPhysics(),
+      itemBuilder: (context, index){
+        DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(items[index]['lastTimestamp'].seconds * 1000);
+        DateFormat dateFormat = DateFormat('hh:mm a');
+        String formattedDate = dateFormat.format(dateTime);
+        print(formattedDate);
+        return Column(
+          children: [
+            Divider(indent: 10, endIndent: 10,),
+            ConversationList(
+                name: items[index]['participants'][0]['name'],
+                messageText: items[index]['lastMessage'],
+                imageUrl: '',
+                time: formattedDate,
+                isMessageRead: true//items[index]['isMessageRead'],
+            )
+          ],
+        );
+      },
+    );
+
+    return conversationList;
+  }
+
+
   @override
   Widget build(BuildContext context) {
+
+    //print('56: ' + items.length.toString());
     return Scaffold(
       bottomNavigationBar: CustomBottomNav(),
       appBar: AppBar(
@@ -57,20 +100,24 @@ class _ChatScreenState extends State<ChatScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             CustomSearchBar(),
-            ListView.builder(
-              reverse: true,
-              itemCount: 1,
-              shrinkWrap: true,
-              padding: EdgeInsets.only(top: 16),
-              physics: NeverScrollableScrollPhysics(),
-              itemBuilder: (context, index){
-                return ConversationList(
-                  name: 'Yonatan',
-                  messageText: 'How you doing?',
-                  imageUrl: '',
-                  time: '2:10',
-                  isMessageRead: (index == 0 || index == 3)?true:false,
-                );
+            FutureBuilder<ListView>(
+              future: loadConversations(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Padding(
+                      padding: EdgeInsets.all(20),
+                      child: CircularProgressIndicator()
+                  );
+                }
+                else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                }
+                else if (snapshot.hasData) {
+                  return snapshot.data!;
+                }
+                else {
+                  return Container();
+                }
               },
             ),
           ],
@@ -79,44 +126,3 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 }
-
-// StreamBuilder<QuerySnapshot>(
-//     stream: _firestore.collection('messages').snapshots(),
-//     builder: (context, snapshot) {
-//       if (snapshot.hasData) {
-//         final messages = snapshot.data;
-//       }
-//       return Container();
-//     }),
-// Container(
-//   decoration: kMessageContainerDecoration,
-//   child: Row(
-//     crossAxisAlignment: CrossAxisAlignment.center,
-//     children: <Widget>[
-//       Expanded(
-//         child: TextField(
-//           onChanged: (value) {
-//             message = value;
-//           },
-//           decoration: kMessageTextFieldDecoration,
-//         ),
-//       ),
-//       TextButton(
-//         onPressed: () {
-//           try {
-//             _firestore.collection('messages').add({
-//               'sender': loggedInUser.email,
-//               'text': message,
-//             });
-//           } catch (e) {
-//             debugPrint(e.toString());
-//           }
-//         },
-//         child: Text(
-//           'Send',
-//           style: kSendButtonTextStyle,
-//         ),
-//       ),
-//     ],
-//   ),
-// ),

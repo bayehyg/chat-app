@@ -19,6 +19,10 @@ dependencies:
   modal_progress_hud_nsn: ^0.5.1
   flutter_chat_ui: ^1.6.12
   random_avatar: ^0.0.8
+  file_picker: ^6.1.1
+  image_picker: ^1.0.7
+  open_filex: ^4.4.0
+  uuid: ^4.3.3
 
 dev_dependencies:
   flutter_test:

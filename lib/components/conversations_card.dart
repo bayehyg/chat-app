@@ -1,4 +1,10 @@
+import 'package:chat_app/screens/chat_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_ui/flutter_chat_ui.dart';
+import 'package:flutter_chat_ui/flutter_chat_ui.dart';
+import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
+import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:random_avatar/random_avatar.dart';
 
 class ConversationList extends StatefulWidget{
@@ -13,10 +19,15 @@ class ConversationList extends StatefulWidget{
 }
 
 class _ConversationListState extends State<ConversationList> {
+  final List<types.Message> _messages = [];
+  final _user = const types.User(id: '82091008-a484-4a89-ae75-a22bf8d6f3ac');
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
       onTap: (){
+        Navigator.push(context, MaterialPageRoute(builder: (context){
+          return ChatPage();
+        }));
       },
       child: Container(
         padding: EdgeInsets.only(left: 16,right: 16,top: 10,bottom: 10),
