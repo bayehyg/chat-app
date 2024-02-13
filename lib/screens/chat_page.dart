@@ -220,8 +220,26 @@ class _ChatPageState extends State<ChatPage> {
       showUserAvatars: true,
       showUserNames: true,
       user: _user,
-      theme: DarkChatTheme(
-      )
+      customBottomWidget: Padding(
+        padding: EdgeInsets.all(15),
+        child: TextField(
+          maxLines: 1,
+          style: TextStyle(color: Color(0xff9691AA)), // Set the text color to white
+          decoration: InputDecoration(
+            constraints: BoxConstraints(maxHeight: 60),
+            filled: true, // Set the background color
+            fillColor: Color(0xff2D2253), // Use a dark purple color
+            border: OutlineInputBorder( // Use a rounded border
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide.none,
+            ),
+            hintText: 'Type a message', // Add a hint text
+            hintStyle: TextStyle(color: Colors.white70), // Set the hint text color to white70
+            suffixIcon: Icon(Icons.attach_file, color: Colors.white), // Add a paperclip icon
+          ),
+        ),
+      ),
+      theme: DarkChatTheme()
     ),
   );
 }
