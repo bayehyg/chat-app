@@ -213,7 +213,6 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) => Scaffold(
     body: Chat(
       messages: _messages,
-      onAttachmentPressed: _handleAttachmentPressed,
       onMessageTap: _handleMessageTap,
       onPreviewDataFetched: _handlePreviewDataFetched,
       onSendPressed: _handleSendPressed,
@@ -235,7 +234,7 @@ class _ChatPageState extends State<ChatPage> {
             ),
             hintText: 'Type a message', // Add a hint text
             hintStyle: TextStyle(color: Colors.white70), // Set the hint text color to white70
-            suffixIcon: Icon(Icons.attach_file, color: Colors.white), // Add a paperclip icon
+            prefixIcon: GestureDetector(onTap: _handleAttachmentPressed,child: Icon(Icons.attach_file, color: Color(0xff9691AA))), // Add a paperclip icon
           ),
         ),
       ),
