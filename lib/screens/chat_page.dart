@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:chat_app/firestore_adapter.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
@@ -23,6 +24,7 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   List<types.Message> _messages = [];
+  late FirestoreAdapter firestore;
   final _user = const types.User(
     id: '82091008-a484-4a89-ae75-a22bf8d6f3ac',
   );
@@ -30,6 +32,7 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     super.initState();
+    firestore = FirestoreAdapter();
     _loadMessages();
   }
 
@@ -194,7 +197,7 @@ class _ChatPageState extends State<ChatPage> {
       id: const Uuid().v4(),
       text: message.text,
     );
-
+      print(message);
     _addMessage(textMessage);
   }
 
@@ -209,36 +212,53 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
+  /**
+   * sends a message
+   * @param controller the text field controller to extract the message
+   */
+  void _sendMessage(TextEditingController controller) {
+    if (controller.text.isNotEmpty) {
+      _handleSendPressed(types.PartialText(text: controller.text));
+      controller.clear();
+    }
+  }
+
   @override
-  Widget build(BuildContext context) => Scaffold(
-    body: Chat(
-      messages: _messages,
-      onMessageTap: _handleMessageTap,
-      onPreviewDataFetched: _handlePreviewDataFetched,
-      onSendPressed: _handleSendPressed,
-      showUserAvatars: true,
-      showUserNames: true,
-      user: _user,
-      customBottomWidget: Padding(
-        padding: EdgeInsets.all(15),
-        child: TextField(
-          maxLines: 1,
-          style: TextStyle(color: Color(0xff9691AA)), // Set the text color to white
-          decoration: InputDecoration(
-            constraints: BoxConstraints(maxHeight: 60),
-            filled: true, // Set the background color
-            fillColor: Color(0xff2D2253), // Use a dark purple color
-            border: OutlineInputBorder( // Use a rounded border
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide.none,
+  Widget build(BuildContext context){
+    final TextEditingController myController = TextEditingController();
+    return Scaffold(
+      body: Chat(
+          messages: _messages,
+
+          onMessageTap: _handleMessageTap,
+          onPreviewDataFetched: _handlePreviewDataFetched,
+          onSendPressed: _handleSendPressed,
+          showUserAvatars: true,
+          showUserNames: true,
+          user: _user,
+          customBottomWidget: Padding(
+            padding: EdgeInsets.all(15),
+            child: TextField(
+              controller: myController,
+              maxLines: 1,
+              style: TextStyle(color: Color(0xff9691AA)), // Set the text color to white
+              decoration: InputDecoration(
+                  constraints: BoxConstraints(maxHeight: 60),
+                  filled: true, // Set the background color
+                  fillColor: Color(0xff2D2253), // Use a dark purple color
+                  border: OutlineInputBorder( // Use a rounded border
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                  hintText: 'Type a message', // Add a hint text
+                  hintStyle: TextStyle(color: Colors.white70), // Set the hint text color to white70
+                  prefixIcon: GestureDetector(onTap: _handleAttachmentPressed,child: Icon(Icons.attach_file, color: Color(0xff9691AA))), // Add a paperclip icon
+                  suffixIcon: GestureDetector(onTap: (){_sendMessage(myController);}, child: Icon(Icons.send_outlined))
+              ),
             ),
-            hintText: 'Type a message', // Add a hint text
-            hintStyle: TextStyle(color: Colors.white70), // Set the hint text color to white70
-            prefixIcon: GestureDetector(onTap: _handleAttachmentPressed,child: Icon(Icons.attach_file, color: Color(0xff9691AA))), // Add a paperclip icon
           ),
-        ),
+          theme: DarkChatTheme()
       ),
-      theme: DarkChatTheme()
-    ),
-  );
+    );
+  }
 }

@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:chat_app/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../components/User.dart';
 import '../components/conversations_card.dart';
 import 'package:intl/intl.dart';
 
@@ -18,7 +19,7 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
 
   final _auth = FirebaseAuth.instance;
-  List items = [];
+  var itemsMap = <String, dynamic>{};
   late FirestoreAdapter firestore;
   late User loggedInUser;
   late String message;
@@ -27,11 +28,14 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState()  {
     super.initState();
     getCurrentUser();
-    firestore = FirestoreAdapter(user: loggedInUser);
+    firestore = FirestoreAdapter(); // TODO: add a user once done with testing
     firestore.listenForChanges().listen((snapshot) {
       setState(() {
         if(snapshot.isNotEmpty){
-          items.addAll(snapshot);
+          itemsMap.addAll(snapshot);
+          // snapshot.forEach((key, value) {
+          //   itemsMap.add()
+          // });
         }
       });
     });
@@ -44,9 +48,23 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+
+  /**
+   * loads the coversation list from the database
+   */
   Future<ListView> loadConversations() async {
 
-    items = await firestore.initialFetch();
+    itemsMap = await firestore.initialFetch();
+    final items = [];
+    ChatUser tempUser;
+    await Future.forEach(itemsMap.entries, (MapEntry<String, dynamic> entry) async {
+      final user = await firestore.fetchUser(entry.value['participantIds'][1]);
+      items.add({
+        'user': user,
+        'value': entry.value
+      });
+    });
+
     final conversationList = ListView.builder(
       reverse: true,
       itemCount: items.length,
@@ -54,16 +72,15 @@ class _ChatScreenState extends State<ChatScreen> {
       padding: EdgeInsets.only(top: 16),
       physics: NeverScrollableScrollPhysics(),
       itemBuilder: (context, index){
-        DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(items[index]['lastTimestamp'].seconds * 1000);
+        DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(items[index]['value']['lastTimestamp'].seconds * 1000);
         DateFormat dateFormat = DateFormat('hh:mm a');
         String formattedDate = dateFormat.format(dateTime);
-        print(formattedDate);
         return Column(
           children: [
             Divider(indent: 10, endIndent: 10,),
             ConversationList(
-                name: items[index]['participants'][0]['name'],
-                messageText: items[index]['lastMessage'],
+                user: items[index]["user"],
+                messageText: items[index]['value']['lastMessage'],
                 imageUrl: '',
                 time: formattedDate,
                 isMessageRead: true//items[index]['isMessageRead'],
@@ -72,7 +89,6 @@ class _ChatScreenState extends State<ChatScreen> {
         );
       },
     );
-
     return conversationList;
   }
 
