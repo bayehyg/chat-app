@@ -22,7 +22,7 @@ class FirestoreAdapter{
     if (docSnapshot.exists) {
       // Cast the data to a Map<String, dynamic>
       Map<String, dynamic> userData = docSnapshot.data() as Map<String, dynamic>;
-      return ChatUser.fromMap(userData);
+      return ChatUser.fromMap(id,userData);
     } else {
       // Handle the case where the document does not exist
       throw Exception('User not found');
@@ -45,7 +45,31 @@ class FirestoreAdapter{
   }
 
 
-  Stream<Map<String, dynamic>> listenForChanges() async* {
+  /**
+   * takes in the the document id and fetches the messages related to that conversation
+   * @param conversationId id
+   */
+  Future<List<Map<String, dynamic>>> fetchMessages(String conversationId) async {
+    final snapshot = await _firestore.collection("conversations")
+        .doc(conversationId).collection("messages").get();
+    List<Map<String, dynamic>> allDocuments = snapshot.docs.map((doc) => doc.data()).toList();
+    print(snapshot.docs);
+    return allDocuments;
+  }
+
+  void sendMessage(String message, String conversationId, String userId) async {
+    final newMessageDoc = _firestore.collection("conversations")
+        .doc(conversationId).collection("messages").doc();
+    newMessageDoc.set({
+      'seen': false,
+      'text': message,
+      'timestamp': Timestamp.now(),
+      'userId': userId
+    });
+
+  }
+
+  Stream<Map<String, dynamic>> listenForConversationChanges() async* {
     final controller = StreamController<Map<String, dynamic>>();
 
     final items = <String, dynamic>{};
@@ -56,7 +80,7 @@ class FirestoreAdapter{
         .listen((querySnapshot) {
       for (final change in querySnapshot.docChanges) {
         final conversation = change.doc.data()!;
-        final conversationId = change.doc.id; // Assuming 'id' is the document ID
+        final conversationId = change.doc.id;
         switch (change.type) {
           case DocumentChangeType.added:
             items[conversationId] = conversation;
@@ -73,7 +97,39 @@ class FirestoreAdapter{
       }
       controller.sink.add(items);
     });
-
     yield* controller.stream;
   }
+
+    Stream<Map<String, dynamic>> listenForMessageChanges(String conversationId) async* {
+      final controller = StreamController<Map<String, dynamic>>();
+
+      final items = <String, dynamic>{};
+
+      _firestore.collection("conversations")
+          .doc(conversationId).collection("messages")
+          .snapshots()
+          .listen((querySnapshot) {
+        for (final change in querySnapshot.docChanges) {
+          final conversation = change.doc.data()!;
+          final conversationId = change.doc.id;
+          switch (change.type) {
+            case DocumentChangeType.added:
+              items[conversationId] = conversation;
+              break;
+            case DocumentChangeType.modified:
+              if (items.containsKey(conversationId)) {
+                items[conversationId] = conversation;
+              }
+              break;
+            case DocumentChangeType.removed:
+              items.remove(conversationId);
+              break;
+          }
+        }
+        controller.sink.add(items);
+      });
+      yield* controller.stream;
+    }
+
+
 }

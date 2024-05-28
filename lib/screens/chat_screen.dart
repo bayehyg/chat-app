@@ -1,3 +1,4 @@
+import 'package:chat_app/UserManager.dart';
 import 'package:chat_app/components/bottomNavigation.dart';
 import 'package:chat_app/components/custom_search_bar.dart';
 import 'package:chat_app/firestore_adapter.dart';
@@ -29,7 +30,12 @@ class _ChatScreenState extends State<ChatScreen> {
     super.initState();
     getCurrentUser();
     firestore = FirestoreAdapter(); // TODO: add a user once done with testing
-    firestore.listenForChanges().listen((snapshot) {
+    var thisUser = firestore.fetchUser("123456789").then((value){
+      UserManager.instance.initializeUser(null, value);
+      return value;
+    }); // TODO: change the hardcoded user
+     // initialized the singleton class UserManager
+    firestore.listenForConversationChanges().listen((snapshot) {
       setState(() {
         if(snapshot.isNotEmpty){
           itemsMap.addAll(snapshot);
@@ -60,6 +66,7 @@ class _ChatScreenState extends State<ChatScreen> {
     await Future.forEach(itemsMap.entries, (MapEntry<String, dynamic> entry) async {
       final user = await firestore.fetchUser(entry.value['participantIds'][1]);
       items.add({
+        'convoId': entry.key,
         'user': user,
         'value': entry.value
       });
@@ -80,6 +87,7 @@ class _ChatScreenState extends State<ChatScreen> {
             Divider(indent: 10, endIndent: 10,),
             ConversationList(
                 user: items[index]["user"],
+                conversationId: items[index]['convoId'],
                 messageText: items[index]['value']['lastMessage'],
                 imageUrl: '',
                 time: formattedDate,

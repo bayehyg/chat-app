@@ -1,4 +1,5 @@
 class ChatUser {
+  final String id;
   final String avatarName;
   final String email;
   final String firstName;
@@ -6,6 +7,7 @@ class ChatUser {
   final DateTime lastSeen;
 
   ChatUser({
+    required this.id,
     required this.avatarName,
     required this.email,
     required this.firstName,
@@ -14,8 +16,9 @@ class ChatUser {
   });
 
   // Factory method to create a User from a map (e.g., Firestore document)
-  factory ChatUser.fromMap(Map<String, dynamic> data) {
+  factory ChatUser.fromMap(String id, Map<String, dynamic> data) {
     return ChatUser(
+      id: id,
       avatarName: data['avatarName'] as String,
       email: data['email'] as String,
       firstName: data['firstName'] as String,

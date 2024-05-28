@@ -10,23 +10,33 @@ import 'package:random_avatar/random_avatar.dart';
 
 class ConversationList extends StatefulWidget{
   ChatUser user;
+  String conversationId;
   String messageText;
   String imageUrl;
   String time;
   bool isMessageRead;
-  ConversationList({super.key, required this.user,required this.messageText,required this.imageUrl,required this.time,required this.isMessageRead});
+  ConversationList({super.key, required this.user, required this.conversationId,required this.messageText,required this.imageUrl,required this.time,required this.isMessageRead});
   @override
   _ConversationListState createState() => _ConversationListState();
 }
 
 class _ConversationListState extends State<ConversationList> {
   final List<types.Message> _messages = [];
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: (){
         Navigator.push(context, MaterialPageRoute(builder: (context){
-          return ChatPage();
+          return ChatPage(
+            conversationId: widget.conversationId,
+            user: types.User(
+              id: widget.user.id,
+              firstName: widget.user.firstName,
+              lastName: widget.user.lastName,
+              lastSeen: widget.user.lastSeen.millisecond
+            ),
+          );
         }));
       },
       child: Container(

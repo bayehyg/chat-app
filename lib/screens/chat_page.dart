@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:chat_app/components/User.dart';
 import 'package:chat_app/firestore_adapter.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -15,8 +16,12 @@ import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
+import '../UserManager.dart';
+
 class ChatPage extends StatefulWidget {
-  const ChatPage({super.key});
+  final types.User user;
+  final String conversationId;
+  const ChatPage({super.key, required this.user, required this.conversationId});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -25,21 +30,87 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   List<types.Message> _messages = [];
   late FirestoreAdapter firestore;
-  final _user = const types.User(
-    id: '82091008-a484-4a89-ae75-a22bf8d6f3ac',
-  );
+  late final types.User _user;
+  late final types.User _thisUser;
+  late final String _localFilePath;
 
   @override
   void initState() {
     super.initState();
     firestore = FirestoreAdapter();
-    _loadMessages();
+    ChatUser myUser = UserManager.instance.currentChatUser!;
+    _thisUser = widget.user;
+    _user = types.User(
+        id: myUser.id,
+        firstName: myUser.firstName,
+        lastName: myUser.lastName,
+        lastSeen: myUser.lastSeen.millisecond
+    );
+    _initializeMessages();
+    firestore.listenForMessageChanges(widget.conversationId).listen((snapshot) {
+      setState(() {
+        if(snapshot.isNotEmpty){
+          snapshot.forEach((key, value) {
+            var temp = types.TextMessage(
+                author: value["userId"] == _thisUser.id ? _thisUser : _user,
+                id: key,
+                text: value['text'],
+                createdAt: value['timestamp'].seconds * 1000
+            );
+            print("author ${temp.author} and message ${temp.text}");
+           _addMessage(temp);
+
+          });
+        }
+      });
+    });
   }
 
   void _addMessage(types.Message message) {
     setState(() {
       _messages.insert(0, message);
+      _saveMessages();
     });
+  }
+
+  void _initializeMessages() async {
+    final directory = await getApplicationDocumentsDirectory();
+    _localFilePath = '${directory.path}/${_user.id}_messages.json';
+
+    if (await File(_localFilePath).exists()) {
+      _loadMessages();
+    } else {
+      _fetchAndSaveMessages();
+    }
+  }
+  void _loadMessages() async {
+    final file = File(_localFilePath);
+    final response = await file.readAsString();
+    final messages = (jsonDecode(response) as List)
+        .map((e) => types.Message.fromJson(e as Map<String, dynamic>))
+        .toList();
+
+    setState(() {
+      _messages = messages;
+    });
+  }
+  void _fetchAndSaveMessages() async {
+    final messages = await firestore.fetchMessages(widget.conversationId);
+    final messagesMap = messages.first;
+    print(messagesMap.toString());
+      var temp = types.TextMessage(
+          author: messagesMap["userId"] == _thisUser.id ? _thisUser : _user,
+          id: "key",
+          text: messagesMap['text'],
+          createdAt: messagesMap['timestamp'].seconds * 1000
+      );
+      _addMessage(temp);
+  }
+
+  void _saveMessages() async {
+    final file = File(_localFilePath);
+    final messagesJson = jsonEncode(_messages.map((e) => e.toJson()).toList());
+    await file.writeAsString(messagesJson);
   }
 
   void _handleAttachmentPressed() {
@@ -134,7 +205,6 @@ class _ChatPageState extends State<ChatPage> {
   void _handleMessageTap(BuildContext _, types.Message message) async {
     if (message is types.FileMessage) {
       var localPath = message.uri;
-
       if (message.uri.startsWith('http')) {
         try {
           final index =
@@ -143,7 +213,6 @@ class _ChatPageState extends State<ChatPage> {
           (_messages[index] as types.FileMessage).copyWith(
             isLoading: true,
           );
-
           setState(() {
             _messages[index] = updatedMessage;
           });
@@ -191,6 +260,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _handleSendPressed(types.PartialText message) {
+    firestore.sendMessage(message.text, widget.conversationId, _thisUser.id);
     final textMessage = types.TextMessage(
       author: _user,
       createdAt: DateTime.now().millisecondsSinceEpoch,
@@ -201,16 +271,6 @@ class _ChatPageState extends State<ChatPage> {
     _addMessage(textMessage);
   }
 
-  void _loadMessages() async {
-    final response = await rootBundle.loadString('assets/messages.json');
-    final messages = (jsonDecode(response) as List)
-        .map((e) => types.Message.fromJson(e as Map<String, dynamic>))
-        .toList();
-
-    setState(() {
-      _messages = messages;
-    });
-  }
 
   /**
    * sends a message
