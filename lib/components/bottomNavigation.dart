@@ -15,13 +15,13 @@ class _CustomBottomNavState extends State<CustomBottomNav> {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     return NavigationBar(
-      backgroundColor: Color(0xFF1F1F1F),
+      backgroundColor: const Color(0xFF1F1F1F),
       onDestinationSelected: (int index) {
         setState(() {
           currentPageIndex = index;
         });
       },
-      indicatorColor: Color(0xff5727B6),
+      indicatorColor: const Color(0xff5727B6),
       selectedIndex: currentPageIndex,
       destinations: <Widget>[
         const NavigationDestination(

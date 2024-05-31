@@ -10,15 +10,15 @@ import '../components/User.dart';
 import '../components/conversations_card.dart';
 import 'package:intl/intl.dart';
 
-
 class ChatScreen extends StatefulWidget {
   static String id = 'chat_screen';
+
+  const ChatScreen({super.key});
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-
   final _auth = FirebaseAuth.instance;
   var itemsMap = <String, dynamic>{};
   late FirestoreAdapter firestore;
@@ -26,72 +26,110 @@ class _ChatScreenState extends State<ChatScreen> {
   late String message;
 
   @override
-  void initState()  {
+  void initState() {
     super.initState();
-    getCurrentUser();
     firestore = FirestoreAdapter(); // TODO: add a user once done with testing
-    var thisUser = firestore.fetchUser("123456789").then((value){
+    getCurrentUserAndFetch();
+    var thisUser = firestore.fetchUser("123456789").then((value) {
       UserManager.instance.initializeUser(null, value);
       return value;
     }); // TODO: change the hardcoded user
-     // initialized the singleton class UserManager
-    firestore.listenForConversationChanges().listen((snapshot) {
+    // initialized the singleton class UserManager
+
+    firestore.listenForConversationChanges(itemsMap).listen((snapshot) {
       setState(() {
-        if(snapshot.isNotEmpty){
-          itemsMap.addAll(snapshot);
-          // snapshot.forEach((key, value) {
-          //   itemsMap.add()
-          // });
-        }
+        if (snapshot.isNotEmpty) {}
       });
     });
   }
 
-  void getCurrentUser() {
+  int getUnreadCount(List<Map<String, dynamic>> messages, DateTime userLastTime,
+      String userId) {
+    int count = 0;
+    messages.forEach((val) {
+      if (DateTime.fromMillisecondsSinceEpoch(val['timestamp'].seconds * 1000)
+              .isAfter(userLastTime) &&
+          val['userId'] != userId) ++count;
+    });
+    return count;
+  }
+
+  void getCurrentUserAndFetch() async {
     final user = _auth.currentUser;
     if (user != null) {
       loggedInUser = user;
     }
+    itemsMap = await firestore.initialFetch();
+    print(itemsMap.length);
+    itemsMap.forEach((key, val) {
+      print("key: $key");
+      firestore.listenForMessageChanges(key).listen((snapshot) {
+        setState(() {});
+      });
+    });
   }
 
-
-  /**
-   * loads the coversation list from the database
-   */
+  /// loads the coversation list from the database
   Future<ListView> loadConversations() async {
-
-    itemsMap = await firestore.initialFetch();
     final items = [];
     ChatUser tempUser;
-    await Future.forEach(itemsMap.entries, (MapEntry<String, dynamic> entry) async {
+    await Future.forEach(itemsMap.entries,
+        (MapEntry<String, dynamic> entry) async {
+      ChatUser myUser = UserManager
+          .instance.currentChatUser!; // the singleton user i.e the owner
+      Map<String, dynamic> thisParticipant = entry.value['participants'][
+          0]; // the participant info in the database currently initialized to the first one for search
+      for (dynamic participant in entry.value['participants']) {
+        if (myUser.id.toString() == participant['userId']) {
+          thisParticipant = participant;
+          break;
+        }
+      }
+      int unread = getUnreadCount(
+          await firestore.fetchMessages(entry.key),
+          DateTime.fromMillisecondsSinceEpoch(
+              thisParticipant['lastReadTimeStamp'].seconds * 1000),
+          myUser.id);
       final user = await firestore.fetchUser(entry.value['participantIds'][1]);
       items.add({
         'convoId': entry.key,
         'user': user,
-        'value': entry.value
+        'value': entry.value,
+        'unread': unread
       });
     });
-
+    items.sort((a, b) {
+      final aTimestamp = DateTime.fromMillisecondsSinceEpoch(
+          a['value']['lastMessage']['timestamp'].seconds * 1000);
+      final bTimestamp = DateTime.fromMillisecondsSinceEpoch(
+          b['value']['lastMessage']['timestamp'].seconds * 1000);
+      return aTimestamp.compareTo(bTimestamp);
+    });
     final conversationList = ListView.builder(
       reverse: true,
       itemCount: items.length,
       shrinkWrap: true,
-      padding: EdgeInsets.only(top: 16),
-      physics: NeverScrollableScrollPhysics(),
-      itemBuilder: (context, index){
-        DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(items[index]['value']['lastTimestamp'].seconds * 1000);
+      padding: const EdgeInsets.only(top: 16),
+      physics: const NeverScrollableScrollPhysics(),
+      itemBuilder: (context, index) {
+        DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(
+            items[index]['value']['lastMessage']['timestamp'].seconds * 1000);
         DateFormat dateFormat = DateFormat('hh:mm a');
         String formattedDate = dateFormat.format(dateTime);
         return Column(
           children: [
-            Divider(indent: 10, endIndent: 10,),
+            const Divider(
+              indent: 10,
+              endIndent: 10,
+            ),
             ConversationList(
-                user: items[index]["user"],
-                conversationId: items[index]['convoId'],
-                messageText: items[index]['value']['lastMessage'],
-                imageUrl: '',
-                time: formattedDate,
-                isMessageRead: true//items[index]['isMessageRead'],
+              user: items[index]["user"],
+              conversationId: items[index]['convoId'],
+              messageText: items[index]['value']['lastMessage']['text'],
+              imageUrl: '',
+              time: formattedDate,
+              isMessageRead: items[index]['unread'] > 0 ? false : true,
+              unRead: items[index]['unread'],
             )
           ],
         );
@@ -100,46 +138,41 @@ class _ChatScreenState extends State<ChatScreen> {
     return conversationList;
   }
 
-
   @override
   Widget build(BuildContext context) {
-
-    //print('56: ' + items.length.toString());
     return Scaffold(
-      bottomNavigationBar: CustomBottomNav(),
+      bottomNavigationBar: const CustomBottomNav(),
       appBar: AppBar(
         leading: null,
         actions: <Widget>[
           IconButton(
-              icon: Icon(CupertinoIcons.gear),
+              icon: const Icon(CupertinoIcons.gear),
               onPressed: () {
                 //Implement logout functionality
               }),
         ],
-        title: Text('CodeBand', style: kLogoTextStyle.copyWith(fontSize: 27, color: Color(0xfff1f1f1))),
+        title: Text('CodeBand',
+            style: kLogoTextStyle.copyWith(
+                fontSize: 27, color: const Color(0xfff1f1f1))),
       ),
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            CustomSearchBar(),
+            const CustomSearchBar(),
             FutureBuilder<ListView>(
               future: loadConversations(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Padding(
                       padding: EdgeInsets.all(20),
-                      child: CircularProgressIndicator()
-                  );
-                }
-                else if (snapshot.hasError) {
+                      child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
-                }
-                else if (snapshot.hasData) {
+                } else if (snapshot.hasData) {
                   return snapshot.data!;
-                }
-                else {
+                } else {
                   return Container();
                 }
               },

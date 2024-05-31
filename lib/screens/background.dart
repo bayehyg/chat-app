@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class CustomBackground extends StatelessWidget {
   final Widget body;
 
-  CustomBackground({required this.body});
+  const CustomBackground({super.key, required this.body});
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +12,7 @@ class CustomBackground extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               image: DecorationImage(
                   image: AssetImage('images/background.jpg'),
                   fit: BoxFit.cover,

@@ -26,7 +26,7 @@ class ChatCard extends StatelessWidget {
             CircleAvatar(
               backgroundImage: NetworkImage(avatarUrl),
             ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           Flexible(
             child: Container(
               decoration: BoxDecoration(
@@ -44,7 +44,7 @@ class ChatCard extends StatelessWidget {
                       color: isCurrentUser ? Colors.white : Colors.black,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
                     message,
                     style: TextStyle(
@@ -55,7 +55,7 @@ class ChatCard extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           if (isCurrentUser)
             CircleAvatar(
               backgroundImage: NetworkImage(avatarUrl),

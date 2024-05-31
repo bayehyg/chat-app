@@ -7,7 +7,7 @@ final kMainThemeData = ThemeData.dark().copyWith(
       size: 30,
       color: Colors.grey.shade300
     ),
-    backgroundColor: Color(0xFF1F1F1F),
+    backgroundColor: const Color(0xFF1F1F1F),
   ),
   buttonTheme: const ButtonThemeData(
       buttonColor: Color(0xff5727B6), textTheme: ButtonTextTheme.primary),
@@ -22,8 +22,8 @@ final kMainThemeData = ThemeData.dark().copyWith(
       color: Color(0XFFffffff),
     ),
   ),
-  scaffoldBackgroundColor: Color(0XFF1C1A1B),
-  textTheme: TextTheme(
+  scaffoldBackgroundColor: const Color(0XFF1C1A1B),
+  textTheme: const TextTheme(
     titleLarge: TextStyle(color: Color(0XFF222222)),
     bodyLarge: TextStyle(fontSize: 16, color: Colors.black),
   ),

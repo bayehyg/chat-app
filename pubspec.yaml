@@ -24,6 +24,11 @@ dependencies:
   open_filex: ^4.4.0
   uuid: ^4.3.3
 
+  flutter_chat_types: any
+  http: any
+  mime: any
+  path_provider: any
+  intl: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

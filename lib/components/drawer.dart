@@ -13,15 +13,15 @@ class CustomDrawer extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: [
           // This is the header of the drawer
-          DrawerHeader(
-            child: Text('Drawer Header'),
+          const DrawerHeader(
             decoration: BoxDecoration(
               color: Colors.blue,
             ),
+            child: Text('Drawer Header'),
           ),
           // These are the items in the drawer
           ListTile(
-            title: Text('Item 1'),
+            title: const Text('Item 1'),
             onTap: () {
               // Update the state of the app
               // ...
@@ -30,7 +30,7 @@ class CustomDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            title: Text('Item 2'),
+            title: const Text('Item 2'),
             onTap: () {
               // Update the state of the app
               // ...

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../screens/login_screen.dart';
 class RoundedButton extends StatelessWidget {
   final Color color;
   final String title;
@@ -12,7 +11,7 @@ class RoundedButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 16.0),
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: Material(
         elevation: 5.0,
         color: color,
