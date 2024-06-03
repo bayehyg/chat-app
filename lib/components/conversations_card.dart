@@ -35,6 +35,7 @@ class _ConversationListState extends State<ConversationList> {
         Navigator.push(context, MaterialPageRoute(builder: (context) {
           return ChatPage(
             conversationId: widget.conversationId,
+            avatarName: widget.user.avatarName,
             user: types.User(
                 id: widget.user.id,
                 firstName: widget.user.firstName,

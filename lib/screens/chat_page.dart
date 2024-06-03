@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:chat_app/components/User.dart';
+import 'package:chat_app/constants.dart';
 import 'package:chat_app/firestore_adapter.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -12,14 +13,20 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:random_avatar/random_avatar.dart';
 import 'package:uuid/uuid.dart';
 
 import '../UserManager.dart';
 
 class ChatPage extends StatefulWidget {
+  final String avatarName;
   final types.User user;
   final String conversationId;
-  const ChatPage({super.key, required this.user, required this.conversationId});
+  const ChatPage(
+      {super.key,
+      required this.user,
+      required this.conversationId,
+      required this.avatarName});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -28,8 +35,8 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   List<types.Message> _messages = [];
   late FirestoreAdapter firestore;
-  late final types.User _user;
-  late final types.User _thisUser;
+  late final types.User _user; // the current owner
+  late final types.User _thisUser; // the person on the other side
   late final String _localFilePath;
 
   @override
@@ -49,23 +56,25 @@ class _ChatPageState extends State<ChatPage> {
 
   void subscribeToMessages() {
     firestore.listenForMessageChanges(widget.conversationId).listen((snapshot) {
-      setState(() {
-        if (snapshot.isNotEmpty) {
-          snapshot.forEach((key, value) {
-            var temp = types.TextMessage(
-                showStatus: true,
-                status: value["seen"] == true
-                    ? types.Status.seen
-                    : types.Status.delivered,
-                author: value["userId"] == _thisUser.id ? _thisUser : _user,
-                id: key,
-                text: value['text'],
-                createdAt: value['timestamp'].seconds * 1000);
-            print("author ${temp.author} and message ${temp.text}");
-            _addMessage(temp);
-          });
-        }
-      });
+      if (mounted) {
+        setState(() {
+          if (snapshot.isNotEmpty) {
+            snapshot.forEach((key, value) {
+              var temp = types.TextMessage(
+                  showStatus: true,
+                  status: value["seen"] == true
+                      ? types.Status.seen
+                      : types.Status.delivered,
+                  author: value["userId"] == _thisUser.id ? _thisUser : _user,
+                  id: key,
+                  text: value['text'],
+                  createdAt: value['timestamp'].seconds * 1000);
+              print("author ${temp.author} and message ${temp.text}");
+              _addMessage(temp);
+            });
+          }
+        });
+      }
     });
   }
 
@@ -93,10 +102,11 @@ class _ChatPageState extends State<ChatPage> {
     final messages = (jsonDecode(response) as List)
         .map((e) => types.Message.fromJson(e as Map<String, dynamic>))
         .toList();
-
-    setState(() {
-      _messages = messages;
-    });
+    if (mounted) {
+      setState(() {
+        _messages = messages;
+      });
+    }
   }
 
   void _fetchAndSaveMessages() async {
@@ -106,7 +116,7 @@ class _ChatPageState extends State<ChatPage> {
     var temp = types.TextMessage(
         showStatus: true,
         author: messagesMap["userId"] == _thisUser.id ? _thisUser : _user,
-        id: "key",
+        id: const Uuid().v4(),
         text: messagesMap['text'],
         createdAt: messagesMap['timestamp'].seconds * 1000);
     _addMessage(temp);
@@ -265,14 +275,13 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _handleSendPressed(types.PartialText message) {
-    firestore.sendMessage(message.text, widget.conversationId, _thisUser.id);
+    firestore.sendMessage(message.text, widget.conversationId, _user.id);
     final textMessage = types.TextMessage(
       author: _user,
       createdAt: DateTime.now().millisecondsSinceEpoch,
       id: const Uuid().v4(),
       text: message.text,
     );
-    print(message);
     _addMessage(textMessage);
   }
 
@@ -287,13 +296,25 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
+    firestore.updateConversationLastRead(widget.conversationId, _user.id);
     final TextEditingController myController = TextEditingController();
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor:
+            Color(0xff141414), // Set the background color of the AppBar
+        leading: Padding(
+            padding: const EdgeInsets.fromLTRB(10, 5, 0, 5),
+            child: RandomAvatar(widget.avatarName, height: 50, width: 50)),
+        title: Text(
+            style: kNameTextStyle,
+            "${_thisUser.firstName} ${_thisUser.lastName}"), // Replace with the actual user name
+        actions: [],
+      ),
       body: Chat(
           messages: _messages,
-          onMessageTap: _handleMessageTap,
+          //onMessageTap: _handleMessageTap,
           onPreviewDataFetched: _handlePreviewDataFetched,
-          onSendPressed: _handleSendPressed,
+          onSendPressed: (text) {},
           showUserAvatars: true,
           showUserNames: true,
           user: _user,

@@ -37,8 +37,9 @@ class _ChatScreenState extends State<ChatScreen> {
     // initialized the singleton class UserManager
 
     firestore.listenForConversationChanges(itemsMap).listen((snapshot) {
+      print("whats going on: ${snapshot.toString()}");
       setState(() {
-        if (snapshot.isNotEmpty) {}
+        itemsMap = snapshot;
       });
     });
   }

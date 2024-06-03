@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:chat_app/components/User.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -22,6 +23,23 @@ class FirestoreAdapter {
       Map<String, dynamic> userData =
           docSnapshot.data() as Map<String, dynamic>;
       return ChatUser.fromMap(id, userData);
+    } else {
+      // Handle the case where the document does not exist
+      throw Exception('User not found');
+    }
+  }
+
+  Future<ChatUser> fetchUserByEmail(String email) async {
+    final docRef = _firestore
+        .collection('users')
+        .where("email", isEqualTo: email)
+        .limit(1);
+
+    final docSnapshot = await docRef.get();
+    if (docSnapshot.docs.isNotEmpty) {
+      // Cast the data to a Map<String, dynamic>
+      final userDocument = docSnapshot.docs.first;
+      return ChatUser.fromMap(userDocument.id, userDocument.data());
     } else {
       // Handle the case where the document does not exist
       throw Exception('User not found');
@@ -57,17 +75,38 @@ class FirestoreAdapter {
     return allDocuments;
   }
 
+  Future<void> updateConversationLastRead(String convoId, String userId) async {
+    final docRef = _firestore.collection('conversations').doc(convoId);
+    final snapshot = await docRef.get();
+    final data = snapshot.data() as Map<String, dynamic>;
+    final userMaps = data['participants'] as List<dynamic>;
+    final userMap = userMaps.firstWhere(
+      (map) => map['userId'] == userId,
+      orElse: () => null,
+    );
+    if (userMap != null) {
+      // Update the desired field in the userMap
+      userMap['lastReadTimeStamp'] = Timestamp.now();
+      await docRef.update({'participants': userMaps});
+      log('Document updated successfully.');
+    } else {
+      log('User map not found.');
+    }
+  }
+
   void sendMessage(String message, String conversationId, String userId) async {
-    final newMessageDoc = _firestore
-        .collection("conversations")
-        .doc(conversationId)
-        .collection("messages")
-        .doc();
-    newMessageDoc.set({
+    final conversationDoc =
+        _firestore.collection("conversations").doc(conversationId);
+    final newMessageDoc = conversationDoc.collection("messages").doc();
+    Map<String, dynamic> data = {
       'seen': false,
       'text': message,
       'timestamp': Timestamp.now(),
       'userId': userId
+    };
+    newMessageDoc.set(data);
+    await conversationDoc.update({
+      'lastMessage': data,
     });
   }
 

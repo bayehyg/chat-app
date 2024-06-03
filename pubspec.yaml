@@ -29,6 +29,7 @@ dependencies:
   mime: any
   path_provider: any
   intl: any
+  avatar_stack: ^1.2.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
