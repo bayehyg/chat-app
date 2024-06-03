@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:chat_app/components/User.dart';
+import 'package:chat_app/screens/chat_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -44,6 +45,26 @@ class FirestoreAdapter {
       // Handle the case where the document does not exist
       throw Exception('User not found');
     }
+  }
+
+  Future<String> createConversation(List<ChatUser> users) async {
+    List<Map<String, dynamic>> data = [];
+    List<String> participantIds = [];
+    for (ChatUser person in users) {
+      participantIds.add(person.id);
+      data.add({
+        'lastReadTimeStamp': Timestamp.now(),
+        'name': person.getFullName(),
+        'userId': person.id
+      });
+    }
+    DocumentReference conversationRef =
+        await _firestore.collection('conversations').add({
+      'participants': data, // Array field of participants
+      'participantIds': participantIds
+    });
+
+    return conversationRef.id;
   }
 
   Future<Map<String, dynamic>> initialFetch() async {
