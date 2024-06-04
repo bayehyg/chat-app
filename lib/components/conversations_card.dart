@@ -5,7 +5,8 @@ import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:random_avatar/random_avatar.dart';
 
 class ConversationList extends StatefulWidget {
-  ChatUser user;
+  List<ChatUser> users;
+  String? groupName;
   String conversationId;
   String messageText;
   String imageUrl;
@@ -14,19 +15,32 @@ class ConversationList extends StatefulWidget {
   int? unRead;
   ConversationList(
       {super.key,
-      required this.user,
+      required this.users,
       required this.conversationId,
       required this.messageText,
       required this.imageUrl,
       required this.time,
       required this.isMessageRead,
-      this.unRead});
+      this.unRead,
+      this.groupName});
   @override
   _ConversationListState createState() => _ConversationListState();
 }
 
 class _ConversationListState extends State<ConversationList> {
-  final List<types.Message> _messages = [];
+  List<types.User> getUsers() {
+    List<types.User> chatUsers = [];
+
+    for (ChatUser temp in widget.users) {
+      chatUsers.add(types.User(
+          id: temp.id,
+          firstName: temp.firstName,
+          lastName: temp.lastName,
+          lastSeen: temp.lastSeen.millisecond));
+    }
+
+    return chatUsers;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,14 +48,10 @@ class _ConversationListState extends State<ConversationList> {
       onTap: () {
         Navigator.push(context, MaterialPageRoute(builder: (context) {
           return ChatPage(
-            conversationId: widget.conversationId,
-            avatarName: widget.user.avatarName,
-            user: types.User(
-                id: widget.user.id,
-                firstName: widget.user.firstName,
-                lastName: widget.user.lastName,
-                lastSeen: widget.user.lastSeen.millisecond),
-          );
+              conversationId: widget.conversationId,
+              groupName: widget.groupName,
+              avatarName: widget.users[0].avatarName,
+              users: getUsers());
         }));
       },
       child: Container(
@@ -52,7 +62,13 @@ class _ConversationListState extends State<ConversationList> {
             Expanded(
               child: Row(
                 children: <Widget>[
-                  RandomAvatar(widget.user.avatarName, height: 50, width: 50),
+                  widget.groupName == null
+                      ? RandomAvatar(widget.users[0].avatarName,
+                          height: 50, width: 50)
+                      : CircleAvatar(
+                          backgroundColor: Colors.green,
+                          child: Text(widget.groupName![0]),
+                        ),
                   const SizedBox(
                     width: 16,
                   ),
@@ -63,7 +79,9 @@ class _ConversationListState extends State<ConversationList> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text(
-                            widget.user.getFullName(),
+                            widget.groupName == null
+                                ? widget.users[0].getFullName()
+                                : widget.groupName!,
                             style: const TextStyle(fontSize: 16),
                           ),
                           const SizedBox(

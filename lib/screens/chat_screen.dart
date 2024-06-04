@@ -30,7 +30,7 @@ class _ChatScreenState extends State<ChatScreen> {
     super.initState();
     firestore = FirestoreAdapter(); // TODO: add a user once done with testing
     getCurrentUserAndFetch();
-    var thisUser = firestore.fetchUser("123456789").then((value) {
+    firestore.fetchUser("123456789").then((value) {
       UserManager.instance.initializeUser(null, value);
       return value;
     }); // TODO: change the hardcoded user
@@ -91,10 +91,17 @@ class _ChatScreenState extends State<ChatScreen> {
           DateTime.fromMillisecondsSinceEpoch(
               thisParticipant['lastReadTimeStamp'].seconds * 1000),
           myUser.id);
-      final user = await firestore.fetchUser(entry.value['participantIds'][1]);
+      List<ChatUser> users = [];
+      for (String id in entry.value['participantIds']) {
+        if (id != UserManager.instance.currentChatUser!.id) {
+          final user =
+              await firestore.fetchUser(entry.value['participantIds'][1]);
+          users.add(user);
+        }
+      }
       items.add({
         'convoId': entry.key,
-        'user': user,
+        'users': users,
         'value': entry.value,
         'unread': unread
       });
@@ -124,7 +131,8 @@ class _ChatScreenState extends State<ChatScreen> {
               endIndent: 10,
             ),
             ConversationList(
-              user: items[index]["user"],
+              groupName: items[index]['value']['groupName'],
+              users: items[index]["users"],
               conversationId: items[index]['convoId'],
               messageText: items[index]['value']['lastMessage']['text'],
               imageUrl: '',

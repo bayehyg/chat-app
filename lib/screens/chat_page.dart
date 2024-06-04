@@ -19,14 +19,17 @@ import 'package:uuid/uuid.dart';
 import '../UserManager.dart';
 
 class ChatPage extends StatefulWidget {
+  static String id = 'chat_page';
   final String avatarName;
-  final types.User user;
+  final List<types.User> users;
   final String conversationId;
+  final String? groupName;
   const ChatPage(
       {super.key,
-      required this.user,
+      required this.users,
       required this.conversationId,
-      required this.avatarName});
+      required this.avatarName,
+      this.groupName});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -36,14 +39,14 @@ class _ChatPageState extends State<ChatPage> {
   List<types.Message> _messages = [];
   late FirestoreAdapter firestore;
   late final types.User _user; // the current owner
-  late final types.User _thisUser; // the person on the other side
+  late final List<types.User> _thisUsers; // the person on the other side
   late final String _localFilePath;
 
   @override
   void initState() {
     super.initState();
     firestore = FirestoreAdapter();
-    _thisUser = widget.user;
+    _thisUsers = widget.users;
     ChatUser myUser = UserManager.instance.currentChatUser!;
     _user = types.User(
         id: myUser.id,
@@ -52,6 +55,14 @@ class _ChatPageState extends State<ChatPage> {
         lastSeen: myUser.lastSeen.millisecond);
     _initializeMessages();
     subscribeToMessages();
+  }
+
+  types.User findAuthor(String id) {
+    if (id == _user.id) return _user;
+    for (types.User temp in _thisUsers) {
+      if (id == temp.id) return temp;
+    }
+    throw "user not found";
   }
 
   void subscribeToMessages() {
@@ -65,7 +76,7 @@ class _ChatPageState extends State<ChatPage> {
                   status: value["seen"] == true
                       ? types.Status.seen
                       : types.Status.delivered,
-                  author: value["userId"] == _thisUser.id ? _thisUser : _user,
+                  author: findAuthor(value["userId"]),
                   id: key,
                   text: value['text'],
                   createdAt: value['timestamp'].seconds * 1000);
@@ -115,7 +126,7 @@ class _ChatPageState extends State<ChatPage> {
     print(messagesMap.toString());
     var temp = types.TextMessage(
         showStatus: true,
-        author: messagesMap["userId"] == _thisUser.id ? _thisUser : _user,
+        author: findAuthor(messagesMap["userId"]),
         id: const Uuid().v4(),
         text: messagesMap['text'],
         createdAt: messagesMap['timestamp'].seconds * 1000);
@@ -286,7 +297,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   /// sends a message
-  /// @param controller the text field controller to extract the message
+  /// @param controller, the text field controller to extract the message
   void _sendMessage(TextEditingController controller) {
     if (controller.text.isNotEmpty) {
       _handleSendPressed(types.PartialText(text: controller.text));
@@ -303,11 +314,18 @@ class _ChatPageState extends State<ChatPage> {
         backgroundColor:
             Color(0xff141414), // Set the background color of the AppBar
         leading: Padding(
-            padding: const EdgeInsets.fromLTRB(10, 5, 0, 5),
-            child: RandomAvatar(widget.avatarName, height: 50, width: 50)),
+          padding: const EdgeInsets.fromLTRB(10, 5, 0, 5),
+          child: widget.groupName == null
+              ? RandomAvatar(widget.avatarName, height: 50, width: 50)
+              : CircleAvatar(
+                  backgroundColor: Colors.green,
+                  child: Text(widget.groupName![0])),
+        ),
         title: Text(
             style: kNameTextStyle,
-            "${_thisUser.firstName} ${_thisUser.lastName}"), // Replace with the actual user name
+            widget.groupName == null
+                ? "${_thisUsers[0].firstName} ${_thisUsers[0].lastName}"
+                : widget.groupName!), // Replace with the actual user name
         actions: [],
       ),
       body: Chat(
