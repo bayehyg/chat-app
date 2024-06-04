@@ -33,6 +33,7 @@ class _AddUserPageState extends State<AddUserPage> {
     super.initState();
     //myUser = UserManager.instance.currentChatUser!;
     firestore = FirestoreAdapter();
+    myUser = UserManager.instance.currentChatUser!;
   }
 
   bool isValidEmail(String email) {
@@ -44,7 +45,7 @@ class _AddUserPageState extends State<AddUserPage> {
 
   Future<void> _addUser() async {
     final String emailOrUserName = _userIdController.text.trim();
-    if (emailOrUserName == myUser.email || emailOrUserName != myUser.id) {
+    if (emailOrUserName == myUser.email || emailOrUserName == myUser.id) {
       return;
     }
     ChatUser searchUser;
@@ -93,7 +94,39 @@ class _AddUserPageState extends State<AddUserPage> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.check),
-        onPressed: () {},
+        onPressed: () async {
+          if (users.isEmpty) {
+            SnackBar(
+                content: Text(
+              'Please add users first!',
+              style: TextStyle(color: Color(0xff9a0625)),
+            ));
+            return;
+          }
+          if (users.length > 1) {
+            showModalBottomSheet(
+                context: context,
+                builder: (BuildContext context) {
+                  return TextField();
+                });
+          }
+          users.add(myUser);
+          String convoId = await firestore.createConversation(users);
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                    title: const Text('Conversation Created'),
+                    content: ConversationList(
+                      users: users,
+                      conversationId: convoId,
+                      messageText: '',
+                      imageUrl: '',
+                      time: '',
+                      isMessageRead: true,
+                    ));
+              });
+        },
       ),
       appBar: AppBar(
         title: Text('Add User'),
