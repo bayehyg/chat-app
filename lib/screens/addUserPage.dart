@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:avatar_stack/positions.dart';
 import 'package:chat_app/UserManager.dart';
 import 'package:chat_app/firestore_adapter.dart';
@@ -82,6 +84,75 @@ class _AddUserPageState extends State<AddUserPage> {
     }
   }
 
+  void onPressed() async {
+    String? groupName;
+    if (users.isEmpty) {
+      SnackBar(
+          content: Text(
+        'Please add users first!',
+        style: TextStyle(color: Color(0xff9a0625)),
+      ));
+      return;
+    }
+    if (users.length > 1) {
+      final Completer<String> groupNameCompleter = Completer<String>();
+
+      showModalBottomSheet(
+          context: context,
+          builder: (BuildContext context) {
+            return Container(
+              width: double.infinity,
+              height: MediaQuery.of(context).size.height / 4,
+              child: TextField(
+                onSubmitted: (value) {
+                  if (value.isEmpty) {
+                    const SnackBar(
+                      content: Text(
+                        'Please add users first!',
+                        style: TextStyle(color: Color(0xff9a0625)),
+                      ),
+                    );
+                  } else {
+                    groupNameCompleter.complete(value);
+                  }
+                },
+                decoration: InputDecoration(
+                  label: Text("Enter group name"),
+                  hintStyle: TextStyle(color: Colors.grey.shade600),
+                  suffixIcon: Text('OK',
+                      style:
+                          TextStyle(color: Colors.grey.shade600, fontSize: 20)),
+                  filled: true,
+                  fillColor: Colors.grey.shade100,
+                  contentPadding: const EdgeInsets.all(8),
+                  enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      borderSide: BorderSide(color: Colors.grey.shade100)),
+                ),
+              ),
+            );
+          });
+      groupName = await groupNameCompleter.future;
+    }
+    users.add(myUser);
+    String convoId = await firestore.createConversation(users);
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              title: const Text('Conversation Created'),
+              content: ConversationList(
+                groupName: groupName,
+                users: users,
+                conversationId: convoId,
+                messageText: '',
+                imageUrl: '',
+                time: '',
+                isMessageRead: true,
+              ));
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     _userIdController = TextEditingController();
@@ -94,39 +165,7 @@ class _AddUserPageState extends State<AddUserPage> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.check),
-        onPressed: () async {
-          if (users.isEmpty) {
-            SnackBar(
-                content: Text(
-              'Please add users first!',
-              style: TextStyle(color: Color(0xff9a0625)),
-            ));
-            return;
-          }
-          if (users.length > 1) {
-            showModalBottomSheet(
-                context: context,
-                builder: (BuildContext context) {
-                  return TextField();
-                });
-          }
-          users.add(myUser);
-          String convoId = await firestore.createConversation(users);
-          showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                    title: const Text('Conversation Created'),
-                    content: ConversationList(
-                      users: users,
-                      conversationId: convoId,
-                      messageText: '',
-                      imageUrl: '',
-                      time: '',
-                      isMessageRead: true,
-                    ));
-              });
-        },
+        onPressed: onPressed,
       ),
       appBar: AppBar(
         title: Text('Add User'),
