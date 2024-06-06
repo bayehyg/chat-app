@@ -98,7 +98,7 @@ class _ChatPageState extends State<ChatPage> {
 
   void _initializeMessages() async {
     final directory = await getApplicationDocumentsDirectory();
-    _localFilePath = '${directory.path}/${_user.id}_messages.json';
+    _localFilePath = '${directory.path}/${widget.conversationId}_messages.json';
 
     if (await File(_localFilePath).exists()) {
       _loadMessages();
@@ -123,6 +123,7 @@ class _ChatPageState extends State<ChatPage> {
   void _fetchAndSaveMessages() async {
     final messages = await firestore.fetchMessages(widget.conversationId);
     final messagesMap = messages.first;
+    if (messagesMap.isEmpty) return;
     print(messagesMap.toString());
     var temp = types.TextMessage(
         showStatus: true,

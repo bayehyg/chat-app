@@ -107,6 +107,8 @@ class _ChatScreenState extends State<ChatScreen> {
         'unread': unread
       });
     });
+
+    // TODO: fix null issue
     items.sort((a, b) {
       final aTimestamp = DateTime.fromMillisecondsSinceEpoch(
           a['value']['lastMessage']['timestamp'].seconds * 1000);
@@ -114,6 +116,7 @@ class _ChatScreenState extends State<ChatScreen> {
           b['value']['lastMessage']['timestamp'].seconds * 1000);
       return aTimestamp.compareTo(bTimestamp);
     });
+
     final conversationList = ListView.builder(
       reverse: true,
       itemCount: items.length,
@@ -121,10 +124,14 @@ class _ChatScreenState extends State<ChatScreen> {
       padding: const EdgeInsets.only(top: 16),
       physics: const NeverScrollableScrollPhysics(),
       itemBuilder: (context, index) {
-        DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(
-            items[index]['value']['lastMessage']['timestamp'].seconds * 1000);
-        DateFormat dateFormat = DateFormat('hh:mm a');
-        String formattedDate = dateFormat.format(dateTime);
+        String? formattedDate;
+        if (items[index]['value'].containsKey('timestamp')) {
+          DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(
+              items[index]['value']['lastMessage']['timestamp'].seconds * 1000);
+          DateFormat dateFormat = DateFormat('hh:mm a');
+          formattedDate = dateFormat.format(dateTime);
+        }
+
         return Column(
           children: [
             const Divider(
@@ -137,7 +144,7 @@ class _ChatScreenState extends State<ChatScreen> {
               conversationId: items[index]['convoId'],
               messageText: items[index]['value']['lastMessage']['text'],
               imageUrl: '',
-              time: formattedDate,
+              time: formattedDate ?? '',
               isMessageRead: items[index]['unread'] > 0 ? false : true,
               unRead: items[index]['unread'],
             )
