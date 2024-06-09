@@ -2,7 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class CustomBottomNav extends StatefulWidget {
-  const CustomBottomNav({super.key});
+  final Function onNotificationsSelected;
+  final Function onHomeSelected;
+  const CustomBottomNav(
+      {super.key,
+      required this.onNotificationsSelected,
+      required this.onHomeSelected});
 
   @override
   State<CustomBottomNav> createState() => _CustomBottomNavState();
@@ -13,13 +18,19 @@ class _CustomBottomNavState extends State<CustomBottomNav> {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
     return NavigationBar(
       backgroundColor: const Color(0xFF1F1F1F),
       onDestinationSelected: (int index) {
+        if (index == currentPageIndex) return;
         setState(() {
           currentPageIndex = index;
         });
+        if (index == 0) {
+          widget.onHomeSelected();
+        }
+        if (index == 1) {
+          widget.onNotificationsSelected();
+        }
       },
       indicatorColor: const Color(0xff5727B6),
       selectedIndex: currentPageIndex,
@@ -30,13 +41,21 @@ class _CustomBottomNavState extends State<CustomBottomNav> {
           label: 'Home',
         ),
         NavigationDestination(
-          selectedIcon: NavBadge(icon: Icons.notifications_sharp, label: '', color: Colors.white),
-          icon: NavBadge(icon: Icons.notifications_sharp, label: '', color: Colors.grey),
+          selectedIcon: NavBadge(
+              icon: Icons.notifications_sharp, label: '', color: Colors.white),
+          icon: NavBadge(
+              icon: Icons.notifications_sharp, label: '', color: Colors.grey),
           label: 'Notifications',
         ),
         NavigationDestination(
-          selectedIcon: NavBadge(icon: CupertinoIcons.chat_bubble_2, label: '2', color: Colors.white),
-          icon: NavBadge(icon: CupertinoIcons.chat_bubble_2, label: '2', color: Colors.grey),
+          selectedIcon: NavBadge(
+              icon: CupertinoIcons.chat_bubble_2,
+              label: '2',
+              color: Colors.white),
+          icon: NavBadge(
+              icon: CupertinoIcons.chat_bubble_2,
+              label: '2',
+              color: Colors.grey),
           label: 'Messages',
         ),
       ],
@@ -58,8 +77,12 @@ class NavBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Badge(
-      label: label == ''? null: Text(label),
-      child: Icon(icon, color: color, size: 30,),
+      label: label == '' ? null : Text(label),
+      child: Icon(
+        icon,
+        color: color,
+        size: 30,
+      ),
     );
   }
 }

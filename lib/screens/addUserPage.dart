@@ -135,20 +135,24 @@ class _AddUserPageState extends State<AddUserPage> {
       groupName = await groupNameCompleter.future;
     }
     users.add(myUser);
-    String convoId = await firestore.createConversation(users);
+    String convoId = await firestore.createConversation(users, groupName);
     showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
               title: const Text('Conversation Created'),
-              content: ConversationList(
-                groupName: groupName,
-                users: users,
-                conversationId: convoId,
-                messageText: '',
-                imageUrl: '',
-                time: '',
-                isMessageRead: true,
+              content: Container(
+                height: MediaQuery.of(context).size.height / 5,
+                //width: MediaQuery.of(context).size.height * 4 / 5,
+                child: ConversationList(
+                  groupName: groupName,
+                  users: users,
+                  conversationId: convoId,
+                  messageText: '',
+                  imageUrl: '',
+                  time: '',
+                  isMessageRead: true,
+                ),
               ));
         });
   }

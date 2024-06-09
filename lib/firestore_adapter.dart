@@ -47,7 +47,8 @@ class FirestoreAdapter {
     }
   }
 
-  Future<String> createConversation(List<ChatUser> users) async {
+  Future<String> createConversation(
+      List<ChatUser> users, String? groupName) async {
     List<Map<String, dynamic>> data = [];
     List<String> participantIds = [];
     for (ChatUser person in users) {
@@ -58,12 +59,20 @@ class FirestoreAdapter {
         'userId': person.id
       });
     }
+    Map<String, dynamic> last = {
+      'seen': true,
+      'text': '',
+      'timestamp': Timestamp.now(),
+      'userId': ""
+    };
     DocumentReference conversationRef =
         await _firestore.collection('conversations').add({
+      'groupName': groupName,
       'participants': data, // Array field of participants
-      'participantIds': participantIds
+      'participantIds': participantIds,
+      'lastMessage': last
     });
-
+    conversationRef.collection("messages");
     return conversationRef.id;
   }
 

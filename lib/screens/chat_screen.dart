@@ -21,10 +21,11 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final _auth = FirebaseAuth.instance;
-  var itemsMap = <String, dynamic>{};
+  var itemsMaps = <String, dynamic>{};
   late FirestoreAdapter firestore;
   late User loggedInUser;
   late String message;
+  bool notifications = false; // controller for notifications
 
   @override
   void initState() {
@@ -37,10 +38,10 @@ class _ChatScreenState extends State<ChatScreen> {
     }); // TODO: change the hardcoded user
     // initialized the singleton class UserManager
 
-    firestore.listenForConversationChanges(itemsMap).listen((snapshot) {
+    firestore.listenForConversationChanges(itemsMaps).listen((snapshot) {
       print("whats going on: ${snapshot.toString()}");
       setState(() {
-        itemsMap = snapshot;
+        itemsMaps = snapshot;
       });
     });
   }
@@ -61,9 +62,9 @@ class _ChatScreenState extends State<ChatScreen> {
     if (user != null) {
       loggedInUser = user;
     }
-    itemsMap = await firestore.initialFetch();
-    print(itemsMap.length);
-    itemsMap.forEach((key, val) {
+    itemsMaps = await firestore.initialFetch();
+    print(itemsMaps.length);
+    itemsMaps.forEach((key, val) {
       print("key: $key");
       firestore.listenForMessageChanges(key).listen((snapshot) {
         setState(() {});
@@ -72,10 +73,10 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   /// loads the coversation list from the database
-  Future<ListView> loadConversations() async {
+  Future<ListView> loadConversations(
+      Map<String, dynamic> convosMap, bool isjustNotifications) async {
     final items = [];
-    ChatUser tempUser;
-    await Future.forEach(itemsMap.entries,
+    await Future.forEach(convosMap.entries,
         (MapEntry<String, dynamic> entry) async {
       ChatUser myUser = UserManager
           .instance.currentChatUser!; // the singleton user i.e the owner
@@ -100,6 +101,7 @@ class _ChatScreenState extends State<ChatScreen> {
           users.add(user);
         }
       }
+      if (isjustNotifications && unread < 1) return;
       items.add({
         'convoId': entry.key,
         'users': users,
@@ -108,7 +110,6 @@ class _ChatScreenState extends State<ChatScreen> {
       });
     });
 
-    // TODO: fix null issue
     items.sort((a, b) {
       final aTimestamp = DateTime.fromMillisecondsSinceEpoch(
           a['value']['lastMessage']['timestamp'].seconds * 1000);
@@ -125,12 +126,10 @@ class _ChatScreenState extends State<ChatScreen> {
       physics: const NeverScrollableScrollPhysics(),
       itemBuilder: (context, index) {
         String? formattedDate;
-        if (items[index]['value'].containsKey('timestamp')) {
-          DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(
-              items[index]['value']['lastMessage']['timestamp'].seconds * 1000);
-          DateFormat dateFormat = DateFormat('hh:mm a');
-          formattedDate = dateFormat.format(dateTime);
-        }
+        DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(
+            items[index]['value']['lastMessage']['timestamp'].seconds * 1000);
+        DateFormat dateFormat = DateFormat('hh:mm a');
+        formattedDate = dateFormat.format(dateTime);
 
         return Column(
           children: [
@@ -139,7 +138,9 @@ class _ChatScreenState extends State<ChatScreen> {
               endIndent: 10,
             ),
             ConversationList(
-              groupName: items[index]['value']['groupName'],
+              groupName: items[index]['value'].containsKey("groupName")
+                  ? items[index]['value']['groupName']
+                  : null,
               users: items[index]["users"],
               conversationId: items[index]['convoId'],
               messageText: items[index]['value']['lastMessage']['text'],
@@ -162,9 +163,20 @@ class _ChatScreenState extends State<ChatScreen> {
         onPressed: () {
           Navigator.pushNamed(context, AddUserPage.id);
         },
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
-      bottomNavigationBar: const CustomBottomNav(),
+      bottomNavigationBar: CustomBottomNav(
+        onNotificationsSelected: () {
+          setState(() {
+            notifications = true;
+          });
+        },
+        onHomeSelected: () {
+          setState(() {
+            notifications = false;
+          });
+        },
+      ),
       appBar: AppBar(
         leading: null,
         actions: <Widget>[
@@ -185,7 +197,7 @@ class _ChatScreenState extends State<ChatScreen> {
           children: <Widget>[
             const CustomSearchBar(),
             FutureBuilder<ListView>(
-              future: loadConversations(),
+              future: loadConversations(itemsMaps, notifications),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Padding(
