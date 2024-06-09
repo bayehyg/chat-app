@@ -30,6 +30,8 @@ dependencies:
   path_provider: any
   intl: any
   avatar_stack: ^1.2.0
+  line_icons: ^2.0.3
+  line_awesome_flutter: ^3.0.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

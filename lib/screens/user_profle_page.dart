@@ -1,26 +1,41 @@
+import 'package:chat_app/screens/profile_menu.dart';
 import 'package:flutter/material.dart';
+import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
+class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({super.key});
 
   @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  final Color yellow = Color(0xffFFE501);
+  final Color blue = Color(0xff007BFF);
+  var isDark = true;
+  @override
   Widget build(BuildContext context) {
-    var isDark = MediaQuery.of(context).platformBrightness == Brightness.dark;
     return Scaffold(
+      //backgroundColor: isDark ? const Color(0xff303030) : Color(0xffFAFAFA),
       appBar: AppBar(
         leading: IconButton(
-            onPressed: () => Get.back(),
-            icon: const Icon(LineAwesomeIcons.angle_left)),
-        title: Text(tProfile, style: Theme.of(context).textTheme.headline4),
+            onPressed: () {
+              // TODO: implement this
+            },
+            icon: Icon(LineAwesomeIcons.angle_left_solid)),
+        title:
+            Text("Profile", style: Theme.of(context).textTheme.headlineLarge),
         actions: [
           IconButton(
-              onPressed: () {},
+              onPressed: () {
+                isDark = !isDark;
+              },
               icon: Icon(isDark ? LineAwesomeIcons.sun : LineAwesomeIcons.moon))
         ],
       ),
       body: SingleChildScrollView(
         child: Container(
-          padding: const EdgeInsets.all(tDefaultSize),
+          padding: const EdgeInsets.all(20),
           child: Column(
             children: [
               /// -- IMAGE
@@ -44,7 +59,7 @@ class ProfileScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(100),
                           color: Colors.white),
                       child: const Icon(
-                        LineAwesomeIcons.alternate_pencil,
+                        LineAwesomeIcons.pencil_alt_solid,
                         color: Colors.black,
                         size: 20,
                       ),
@@ -53,23 +68,24 @@ class ProfileScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 10),
-              Text(tProfileHeading,
-                  style: Theme.of(context).textTheme.headline4),
-              Text(tProfileSubHeading,
-                  style: Theme.of(context).textTheme.bodyText2),
+              Text("Profile", style: Theme.of(context).textTheme.headlineLarge),
+              Text("Benjamin Yield",
+                  style: Theme.of(context).textTheme.bodyMedium),
               const SizedBox(height: 20),
 
               /// -- BUTTON
               SizedBox(
                 width: 200,
                 child: ElevatedButton(
-                  onPressed: () => Get.to(() => const UpdateProfileScreen()),
+                  onPressed: () => () {
+                    // TODO: implement this
+                  },
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: tPrimaryColor,
+                      backgroundColor: yellow,
                       side: BorderSide.none,
                       shape: const StadiumBorder()),
-                  child: const Text(tEditProfile,
-                      style: TextStyle(color: tDarkColor)),
+                  child: const Text("Edit profile",
+                      style: TextStyle(color: Color(0xff303030), fontSize: 15)),
                 ),
               ),
               const SizedBox(height: 30),
@@ -79,48 +95,51 @@ class ProfileScreen extends StatelessWidget {
               /// -- MENU
               ProfileMenuWidget(
                   title: "Settings",
-                  icon: LineAwesomeIcons.cog,
+                  icon: Icon(
+                    LineAwesomeIcons.cog_solid,
+                  ),
                   onPress: () {}),
               ProfileMenuWidget(
                   title: "Billing Details",
-                  icon: LineAwesomeIcons.wallet,
+                  icon: LineAwesomeIcons.wallet_solid,
                   onPress: () {}),
               ProfileMenuWidget(
                   title: "User Management",
-                  icon: LineAwesomeIcons.user_check,
+                  icon: LineAwesomeIcons.user_check_solid,
                   onPress: () {}),
               const Divider(),
               const SizedBox(height: 10),
               ProfileMenuWidget(
                   title: "Information",
-                  icon: LineAwesomeIcons.info,
+                  icon: LineAwesomeIcons.info_circle_solid,
                   onPress: () {}),
               ProfileMenuWidget(
                   title: "Logout",
-                  icon: LineAwesomeIcons.alternate_sign_out,
+                  icon: LineAwesomeIcons.sign_out_alt_solid,
                   textColor: Colors.red,
                   endIcon: false,
                   onPress: () {
-                    Get.defaultDialog(
-                      title: "LOGOUT",
-                      titleStyle: const TextStyle(fontSize: 20),
-                      content: const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 15.0),
-                        child: Text("Are you sure, you want to Logout?"),
-                      ),
-                      confirm: Expanded(
-                        child: ElevatedButton(
-                          onPressed: () =>
-                              AuthenticationRepository.instance.logout(),
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.redAccent,
-                              side: BorderSide.none),
-                          child: const Text("Yes"),
-                        ),
-                      ),
-                      cancel: OutlinedButton(
-                          onPressed: () => Get.back(), child: const Text("No")),
-                    );
+                    // Get.defaultDialog(
+                    //   title: "LOGOUT",
+                    //   titleStyle: const TextStyle(fontSize: 20),
+                    //   content: const Padding(
+                    //     padding: EdgeInsets.symmetric(vertical: 15.0),
+                    //     child: Text("Are you sure, you want to Logout?"),
+                    //   ),
+                    //   confirm: Expanded(
+                    //     child: ElevatedButton(
+                    //       onPressed: () {
+                    //         // TODO: implement this
+                    //       },
+                    //       style: ElevatedButton.styleFrom(
+                    //           backgroundColor: Colors.redAccent,
+                    //           side: BorderSide.none),
+                    //       child: const Text("Yes"),
+                    //     ),
+                    //   ),
+                    //   cancel: OutlinedButton(
+                    //       onPressed: () => Get.back(), child: const Text("No")),
+                    // );
                   }),
             ],
           ),

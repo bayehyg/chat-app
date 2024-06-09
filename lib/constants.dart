@@ -3,10 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 final kMainThemeData = ThemeData.dark().copyWith(
   bottomNavigationBarTheme: BottomNavigationBarThemeData(
-    unselectedIconTheme: IconThemeData(
-      size: 30,
-      color: Colors.grey.shade300
-    ),
+    unselectedIconTheme: IconThemeData(size: 30, color: Colors.grey.shade300),
     backgroundColor: const Color(0xFF1F1F1F),
   ),
   buttonTheme: const ButtonThemeData(
@@ -26,6 +23,16 @@ final kMainThemeData = ThemeData.dark().copyWith(
   textTheme: const TextTheme(
     titleLarge: TextStyle(color: Color(0XFF222222)),
     bodyLarge: TextStyle(fontSize: 16, color: Colors.black),
+    headlineLarge: TextStyle(
+      fontSize: 32.0,
+      fontWeight: FontWeight.bold,
+      color: Colors.black,
+    ),
+    bodyMedium: TextStyle(
+      fontSize: 14.0,
+      fontWeight: FontWeight.normal,
+      color: Colors.grey,
+    ),
   ),
 );
 

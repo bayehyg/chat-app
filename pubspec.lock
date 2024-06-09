@@ -464,6 +464,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.1"
+  line_awesome_flutter:
+    dependency: "direct main"
+    description:
+      name: line_awesome_flutter
+      sha256: "24cef0a34816ffed9846f1793172333be50dc29678d499893b3cb38d3c53db24"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.1"
+  line_icons:
+    dependency: "direct main"
+    description:
+      name: line_icons
+      sha256: "249d781d922f5437ac763d9c8f5a02cf5b499a6dc3f85e4b92e074cff0a932ab"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.3"
   linkify:
     dependency: transitive
     description:
