@@ -1,9 +1,13 @@
 import 'package:chat_app/screens/profile_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'package:random_avatar/random_avatar.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  //final String avatar;
+  const ProfileScreen({
+    super.key,
+  }); //required this.avatar});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -23,15 +27,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
               // TODO: implement this
             },
             icon: Icon(LineAwesomeIcons.angle_left_solid)),
-        title:
-            Text("Profile", style: Theme.of(context).textTheme.headlineLarge),
-        actions: [
-          IconButton(
-              onPressed: () {
-                isDark = !isDark;
-              },
-              icon: Icon(isDark ? LineAwesomeIcons.sun : LineAwesomeIcons.moon))
-        ],
+        title: Padding(
+          padding: EdgeInsets.only(
+            left: MediaQuery.of(context).size.width / 4.6,
+          ),
+          child: Text(
+            "Profile",
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color: isDark ? Colors.white : null,
+                ),
+            textAlign: TextAlign.center,
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -49,28 +56,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child:
                             null), // TODO: const Image(image: AssetImage(""))),
                   ),
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: Container(
-                      width: 35,
-                      height: 35,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(100),
-                          color: Colors.white),
-                      child: const Icon(
-                        LineAwesomeIcons.pencil_alt_solid,
-                        color: Colors.black,
-                        size: 20,
-                      ),
-                    ),
+                  RandomAvatar(
+                    "widget.avatar",
+                    width: 130,
+                    height: 130,
                   ),
                 ],
               ),
               const SizedBox(height: 10),
-              Text("Profile", style: Theme.of(context).textTheme.headlineLarge),
-              Text("Benjamin Yield",
-                  style: Theme.of(context).textTheme.bodyMedium),
+              Text("Yonatan Bayeh",
+                  style: Theme.of(context)
+                      .textTheme
+                      .headlineLarge
+                      ?.copyWith(color: isDark ? Colors.white : null)),
+              Text("email", style: Theme.of(context).textTheme.bodyMedium),
               const SizedBox(height: 20),
 
               /// -- BUTTON
@@ -95,9 +94,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               /// -- MENU
               ProfileMenuWidget(
                   title: "Settings",
-                  icon: Icon(
-                    LineAwesomeIcons.cog_solid,
-                  ),
+                  icon: LineAwesomeIcons.cog_solid,
                   onPress: () {}),
               ProfileMenuWidget(
                   title: "Billing Details",
@@ -110,9 +107,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const Divider(),
               const SizedBox(height: 10),
               ProfileMenuWidget(
-                  title: "Information",
-                  icon: LineAwesomeIcons.info_circle_solid,
-                  onPress: () {}),
+                title: "Information",
+                icon: LineAwesomeIcons.info_circle_solid,
+                onPress: () {},
+              ),
               ProfileMenuWidget(
                   title: "Logout",
                   icon: LineAwesomeIcons.sign_out_alt_solid,
