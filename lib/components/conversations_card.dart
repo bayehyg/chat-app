@@ -1,3 +1,4 @@
+import 'package:chat_app/UserManager.dart';
 import 'package:chat_app/components/User.dart';
 import 'package:chat_app/screens/chat_page.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +29,19 @@ class ConversationList extends StatefulWidget {
 }
 
 class _ConversationListState extends State<ConversationList> {
+  late final ChatUser? _user;
+  late final String avatarName;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _user = UserManager.instance.currentChatUser;
+    avatarName = _user!.id != widget.users[0].id
+        ? widget.users[0].avatarName
+        : widget.users[1].avatarName;
+  }
+
   List<types.User> getUsers() {
     List<types.User> chatUsers = [];
 
@@ -63,8 +77,7 @@ class _ConversationListState extends State<ConversationList> {
               child: Row(
                 children: <Widget>[
                   widget.groupName == null
-                      ? RandomAvatar(widget.users[0].avatarName,
-                          height: 50, width: 50)
+                      ? RandomAvatar(avatarName, height: 50, width: 50)
                       : CircleAvatar(
                           backgroundColor: Colors.green,
                           child: Text(widget.groupName![0]),

@@ -49,11 +49,11 @@ class _ChatScreenState extends State<ChatScreen> {
   int getUnreadCount(List<Map<String, dynamic>> messages, DateTime userLastTime,
       String userId) {
     int count = 0;
-    messages.forEach((val) {
+    for (var val in messages) {
       if (DateTime.fromMillisecondsSinceEpoch(val['timestamp'].seconds * 1000)
               .isAfter(userLastTime) &&
           val['userId'] != userId) ++count;
-    });
+    }
     return count;
   }
 
