@@ -1,3 +1,5 @@
+import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
+
 class ChatUser {
   final String id;
   final String avatarName;
@@ -23,7 +25,8 @@ class ChatUser {
       email: data['email'] as String,
       firstName: data['firstName'] as String,
       lastName: data['lastName'] as String,
-      lastSeen: DateTime.fromMillisecondsSinceEpoch(data['lastSeen'].seconds * 1000),
+      lastSeen:
+          DateTime.fromMillisecondsSinceEpoch(data['lastSeen'].seconds * 1000),
     );
   }
 
@@ -38,7 +41,7 @@ class ChatUser {
     };
   }
 
-  String getFullName(){
+  String getFullName() {
     return "$firstName $lastName";
   }
 

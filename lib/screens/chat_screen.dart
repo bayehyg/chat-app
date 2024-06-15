@@ -25,6 +25,7 @@ class _ChatScreenState extends State<ChatScreen> {
   late FirestoreAdapter firestore;
   late User loggedInUser;
   late String message;
+  late final ChatUser myUser;
   bool notifications = false; // controller for notifications
 
   @override
@@ -33,6 +34,7 @@ class _ChatScreenState extends State<ChatScreen> {
     firestore = FirestoreAdapter(); // TODO: add a user once done with testing
     getCurrentUserAndFetch();
     firestore.fetchUser("123456789").then((value) {
+      myUser = value;
       UserManager.instance.initializeUser(null, value);
       return value;
     }); // TODO: change the hardcoded user
@@ -95,9 +97,8 @@ class _ChatScreenState extends State<ChatScreen> {
           myUser.id);
       List<ChatUser> users = [];
       for (String id in entry.value['participantIds']) {
-        if (id != UserManager.instance.currentChatUser!.id) {
-          final user =
-              await firestore.fetchUser(entry.value['participantIds'][1]);
+        if (id != myUser.id) {
+          final user = await firestore.fetchUser(id);
           users.add(user);
         }
       }
@@ -117,42 +118,46 @@ class _ChatScreenState extends State<ChatScreen> {
           b['value']['lastMessage']['timestamp'].seconds * 1000);
       return aTimestamp.compareTo(bTimestamp);
     });
+    final ListView conversationList;
+    try {
+      conversationList = ListView.builder(
+        reverse: true,
+        itemCount: items.length,
+        shrinkWrap: true,
+        padding: const EdgeInsets.only(top: 16),
+        physics: const NeverScrollableScrollPhysics(),
+        itemBuilder: (context, index) {
+          String? formattedDate;
+          DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(
+              items[index]['value']['lastMessage']['timestamp'].seconds * 1000);
+          DateFormat dateFormat = DateFormat('hh:mm a');
+          formattedDate = dateFormat.format(dateTime);
 
-    final conversationList = ListView.builder(
-      reverse: true,
-      itemCount: items.length,
-      shrinkWrap: true,
-      padding: const EdgeInsets.only(top: 16),
-      physics: const NeverScrollableScrollPhysics(),
-      itemBuilder: (context, index) {
-        String? formattedDate;
-        DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(
-            items[index]['value']['lastMessage']['timestamp'].seconds * 1000);
-        DateFormat dateFormat = DateFormat('hh:mm a');
-        formattedDate = dateFormat.format(dateTime);
+          return Column(
+            children: [
+              const Divider(
+                indent: 10,
+                endIndent: 10,
+              ),
+              ConversationList(
+                groupName: items[index]['value']['groupName'],
+                users: items[index]["users"],
+                conversationId: items[index]['convoId'],
+                messageText: items[index]['value']['lastMessage']['text'],
+                imageUrl: '',
+                time: formattedDate ?? '',
+                isMessageRead: items[index]['unread'] > 0 ? false : true,
+                unRead: items[index]['unread'],
+              )
+            ],
+          );
+        },
+      );
+    } catch (e) {
+      print(e);
+      return ListView();
+    }
 
-        return Column(
-          children: [
-            const Divider(
-              indent: 10,
-              endIndent: 10,
-            ),
-            ConversationList(
-              groupName: items[index]['value'].containsKey("groupName")
-                  ? items[index]['value']['groupName']
-                  : null,
-              users: items[index]["users"],
-              conversationId: items[index]['convoId'],
-              messageText: items[index]['value']['lastMessage']['text'],
-              imageUrl: '',
-              time: formattedDate ?? '',
-              isMessageRead: items[index]['unread'] > 0 ? false : true,
-              unRead: items[index]['unread'],
-            )
-          ],
-        );
-      },
-    );
     return conversationList;
   }
 

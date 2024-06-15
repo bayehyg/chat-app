@@ -37,9 +37,11 @@ class _ConversationListState extends State<ConversationList> {
     // TODO: implement initState
     super.initState();
     _user = UserManager.instance.currentChatUser;
-    avatarName = _user!.id != widget.users[0].id
-        ? widget.users[0].avatarName
-        : widget.users[1].avatarName;
+    if (widget.groupName == null && _user!.id != widget.users[0].id) {
+      avatarName = widget.users[0].avatarName;
+    } else {
+      avatarName = widget.users[1].avatarName;
+    }
   }
 
   List<types.User> getUsers() {
@@ -62,6 +64,7 @@ class _ConversationListState extends State<ConversationList> {
       onTap: () {
         Navigator.push(context, MaterialPageRoute(builder: (context) {
           return ChatPage(
+              chatUsers: widget.users,
               conversationId: widget.conversationId,
               groupName: widget.groupName,
               avatarName: widget.users[0].avatarName,

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:chat_app/components/User.dart';
+import 'package:chat_app/components/custom_avatar.dart';
 import 'package:chat_app/constants.dart';
 import 'package:chat_app/firestore_adapter.dart';
 import 'package:file_picker/file_picker.dart';
@@ -21,6 +22,7 @@ import '../UserManager.dart';
 class ChatPage extends StatefulWidget {
   static String id = 'chat_page';
   final String avatarName;
+  final List<ChatUser> chatUsers;
   final List<types.User> users;
   final String conversationId;
   final String? groupName;
@@ -29,7 +31,8 @@ class ChatPage extends StatefulWidget {
       required this.users,
       required this.conversationId,
       required this.avatarName,
-      this.groupName});
+      this.groupName,
+      required this.chatUsers});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -317,7 +320,7 @@ class _ChatPageState extends State<ChatPage> {
         leading: Padding(
           padding: const EdgeInsets.fromLTRB(10, 5, 0, 5),
           child: widget.groupName == null
-              ? RandomAvatar(widget.avatarName, height: 50, width: 50)
+              ? CustomAvatar(user: widget.chatUsers[0])
               : CircleAvatar(
                   backgroundColor: Colors.green,
                   child: Text(widget.groupName![0])),

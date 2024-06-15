@@ -1,17 +1,14 @@
+import 'package:chat_app/components/User.dart';
 import 'package:chat_app/screens/profile_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:random_avatar/random_avatar.dart';
 
 class ProfileScreen extends StatefulWidget {
-  final String avatar;
-  final String name;
-  final String email;
+  final ChatUser user;
   const ProfileScreen({
     super.key,
-    required this.avatar,
-    required this.name,
-    required this.email,
+    required this.user,
   }); //required this.avatar});
 
   @override
@@ -62,19 +59,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             null), // TODO: const Image(image: AssetImage(""))),
                   ),
                   RandomAvatar(
-                    widget.avatar,
+                    widget.user.avatarName,
                     width: 130,
                     height: 130,
                   ),
                 ],
               ),
               const SizedBox(height: 10),
-              Text(widget.name,
+              Text(widget.user.getFullName(),
                   style: Theme.of(context)
                       .textTheme
                       .headlineLarge
                       ?.copyWith(color: isDark ? Colors.white : null)),
-              Text(widget.email, style: Theme.of(context).textTheme.bodyMedium),
+              Text(widget.user.email,
+                  style: Theme.of(context).textTheme.bodyMedium),
               const SizedBox(height: 20),
 
               /// -- BUTTON
