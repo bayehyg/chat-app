@@ -33,11 +33,7 @@ class _ChatScreenState extends State<ChatScreen> {
     super.initState();
     firestore = FirestoreAdapter(); // TODO: add a user once done with testing
     getCurrentUserAndFetch();
-    firestore.fetchUser("123456789").then((value) {
-      myUser = value;
-      UserManager.instance.initializeUser(null, value);
-      return value;
-    }); // TODO: change the hardcoded user
+    // TODO: change the hardcoded user
     // initialized the singleton class UserManager
 
     firestore.listenForConversationChanges(itemsMaps).listen((snapshot) {
@@ -63,7 +59,15 @@ class _ChatScreenState extends State<ChatScreen> {
     final user = _auth.currentUser;
     if (user != null) {
       loggedInUser = user;
+    } else {
+      Navigator.pop(context);
+      return;
     }
+    firestore.fetchUser(loggedInUser.uid).then((value) {
+      myUser = value;
+      UserManager.instance.initializeUser(loggedInUser, value);
+      return value;
+    });
     itemsMaps = await firestore.initialFetch();
     print(itemsMaps.length);
     itemsMaps.forEach((key, val) {

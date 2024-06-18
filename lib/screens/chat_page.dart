@@ -125,16 +125,16 @@ class _ChatPageState extends State<ChatPage> {
 
   void _fetchAndSaveMessages() async {
     final messages = await firestore.fetchMessages(widget.conversationId);
-    final messagesMap = messages.first;
-    if (messagesMap.isEmpty) return;
-    print(messagesMap.toString());
-    var temp = types.TextMessage(
-        showStatus: true,
-        author: findAuthor(messagesMap["userId"]),
-        id: const Uuid().v4(),
-        text: messagesMap['text'],
-        createdAt: messagesMap['timestamp'].seconds * 1000);
-    _addMessage(temp);
+    if (messages.isEmpty) return;
+    for (var message in messages) {
+      var temp = types.TextMessage(
+          showStatus: true,
+          author: findAuthor(message["userId"]),
+          id: const Uuid().v4(),
+          text: message['text'],
+          createdAt: (message['timestamp'].seconds * 1000));
+      _addMessage(temp);
+    }
   }
 
   void _saveMessages() async {

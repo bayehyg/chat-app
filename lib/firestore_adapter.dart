@@ -1,16 +1,15 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:chat_app/UserManager.dart';
 import 'package:chat_app/components/User.dart';
 import 'package:chat_app/screens/chat_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class FirestoreAdapter {
-  User? user;
+  static User? user = UserManager.instance.currentUser;
   final _firestore = FirebaseFirestore.instance;
-
-  FirestoreAdapter({this.user});
 
   /// This method fetches a user from firestore and returns the user as a ChatUser object
   ///
@@ -143,30 +142,34 @@ class FirestoreAdapter {
   Stream<Map<String, dynamic>> listenForConversationChanges(
       Map<String, dynamic> items) async* {
     final controller = StreamController<Map<String, dynamic>>();
-    _firestore
-        .collection("conversations")
-        .where("participantIds", arrayContains: "123456789")
-        .snapshots()
-        .listen((querySnapshot) {
-      for (final change in querySnapshot.docChanges) {
-        final conversation = change.doc.data()!;
-        final conversationId = change.doc.id;
-        switch (change.type) {
-          case DocumentChangeType.added:
-            items[conversationId] = conversation;
-            break;
-          case DocumentChangeType.modified:
-            if (items.containsKey(conversationId)) {
+    try {
+      _firestore
+          .collection("conversations")
+          .where("participantIds", arrayContains: user!.uid)
+          .snapshots()
+          .listen((querySnapshot) {
+        for (final change in querySnapshot.docChanges) {
+          final conversation = change.doc.data()!;
+          final conversationId = change.doc.id;
+          switch (change.type) {
+            case DocumentChangeType.added:
               items[conversationId] = conversation;
-            }
-            break;
-          case DocumentChangeType.removed:
-            items.remove(conversationId);
-            break;
+              break;
+            case DocumentChangeType.modified:
+              if (items.containsKey(conversationId)) {
+                items[conversationId] = conversation;
+              }
+              break;
+            case DocumentChangeType.removed:
+              items.remove(conversationId);
+              break;
+          }
         }
-      }
-      controller.sink.add(items);
-    });
+        controller.sink.add(items);
+      });
+    } catch (e) {
+      log(e.toString());
+    }
     yield* controller.stream;
   }
 
@@ -176,31 +179,35 @@ class FirestoreAdapter {
 
     final items = <String, dynamic>{};
 
-    _firestore
-        .collection("conversations")
-        .doc(conversationId)
-        .collection("messages")
-        .snapshots()
-        .listen((querySnapshot) {
-      for (final change in querySnapshot.docChanges) {
-        final conversation = change.doc.data()!;
-        final conversationId = change.doc.id;
-        switch (change.type) {
-          case DocumentChangeType.added:
-            items[conversationId] = conversation;
-            break;
-          case DocumentChangeType.modified:
-            if (items.containsKey(conversationId)) {
+    try {
+      _firestore
+          .collection("conversations")
+          .doc(conversationId)
+          .collection("messages")
+          .snapshots()
+          .listen((querySnapshot) {
+        for (final change in querySnapshot.docChanges) {
+          final conversation = change.doc.data()!;
+          final conversationId = change.doc.id;
+          switch (change.type) {
+            case DocumentChangeType.added:
               items[conversationId] = conversation;
-            }
-            break;
-          case DocumentChangeType.removed:
-            items.remove(conversationId);
-            break;
+              break;
+            case DocumentChangeType.modified:
+              if (items.containsKey(conversationId)) {
+                items[conversationId] = conversation;
+              }
+              break;
+            case DocumentChangeType.removed:
+              items.remove(conversationId);
+              break;
+          }
         }
-      }
-      controller.sink.add(items);
-    });
+        controller.sink.add(items);
+      });
+    } catch (e) {
+      log(e.toString());
+    }
     yield* controller.stream;
   }
 }

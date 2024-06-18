@@ -26,7 +26,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(
         leading: IconButton(
             onPressed: () {
-              // TODO: implement this
+              Navigator.pop(context);
             },
             icon: Icon(LineAwesomeIcons.angle_left_solid)),
         title: Padding(
