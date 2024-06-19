@@ -74,11 +74,11 @@ const kTextFieldDecoration = InputDecoration(
     borderRadius: BorderRadius.all(Radius.circular(10)),
   ),
   enabledBorder: OutlineInputBorder(
-    borderSide: BorderSide(color: Colors.lightBlueAccent, width: 1.0),
+    borderSide: BorderSide(color: Color(0xFFFFFFFF), width: 1.0),
     borderRadius: BorderRadius.all(Radius.circular(10)),
   ),
   focusedBorder: OutlineInputBorder(
-    borderSide: BorderSide(color: Colors.lightBlueAccent, width: 2.0),
+    borderSide: BorderSide(color: Color(0xFFFFFFFF), width: 1.0),
     borderRadius: BorderRadius.all(Radius.circular(10)),
   ),
 );

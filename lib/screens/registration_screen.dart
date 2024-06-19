@@ -1,9 +1,12 @@
+import 'package:chat_app/UserManager.dart';
 import 'package:chat_app/components/roundedButton.dart';
+import 'package:chat_app/firestore_adapter.dart';
 import 'package:chat_app/screens/background.dart';
 import 'package:chat_app/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
+import '../components/User.dart';
 import '../constants.dart';
 
 class RegistrationScreen extends StatefulWidget {
@@ -16,9 +19,13 @@ class RegistrationScreen extends StatefulWidget {
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
   final _auth = FirebaseAuth.instance;
+  final _firestore = FirestoreAdapter();
   late FocusNode textFieldFocusNode;
   late String email;
   late String password;
+  late String avatarName;
+  late String firstName;
+  late String lastName;
   bool showSpin = false;
 
   void _navigateToChatScreen() {
@@ -68,81 +75,149 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   padding: EdgeInsets.only(
                       right: widthReference / 20,
                       left: widthReference / 20,
-                      bottom: heightReference / 7),
+                      bottom: heightReference / 20),
                   child: Container(
                     padding: EdgeInsets.all(20),
                     decoration: BoxDecoration(
                         color: Color(0xff4C2C8D),
                         borderRadius: BorderRadius.circular(15)),
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: <Widget>[
-                        Hero(
-                          tag: 'logo',
-                          child: SizedBox(
-                            height: !textFieldFocusNode.hasFocus
-                                ? heightReference / 5
-                                : 0,
-                            child: Image.asset('images/logo.png'),
+                        Flexible(
+                          child: Hero(
+                            tag: 'logo',
+                            child: SizedBox(
+                              height: !textFieldFocusNode.hasFocus
+                                  ? heightReference / 5
+                                  : 0,
+                              child: Image.asset('images/logo.png'),
+                            ),
                           ),
                         ),
                         SizedBox(
-                          height: heightReference / 12,
+                          height: heightReference / 30,
                         ),
-                        TextField(
-                          focusNode: textFieldFocusNode,
-                          keyboardType: TextInputType.emailAddress,
-                          textAlign: TextAlign.center,
-                          onChanged: (value) {
-                            email = value;
-                          },
-                          style: kNameTextStyle,
-                          decoration: kTextFieldDecoration.copyWith(
-                              hintText: 'Enter your email'),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Flexible(
+                              child: TextField(
+                                focusNode: textFieldFocusNode,
+                                keyboardType: TextInputType.emailAddress,
+                                textAlign: TextAlign.center,
+                                onChanged: (value) {
+                                  firstName = value;
+                                },
+                                style: kNameTextStyle,
+                                decoration: kTextFieldDecoration.copyWith(
+                                    hintText: 'First name'),
+                              ),
+                            ),
+                            SizedBox(
+                              width: widthReference / 20,
+                            ),
+                            Flexible(
+                              child: TextField(
+                                focusNode: textFieldFocusNode,
+                                keyboardType: TextInputType.emailAddress,
+                                textAlign: TextAlign.center,
+                                onChanged: (value) {
+                                  lastName = value;
+                                },
+                                style: kNameTextStyle,
+                                decoration: kTextFieldDecoration.copyWith(
+                                    hintText: 'Last name'),
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(
-                          height: 8.0,
+                        SizedBox(
+                          height: heightReference / 70,
                         ),
-                        TextField(
-                          focusNode: textFieldFocusNode,
-                          obscureText: true,
-                          textAlign: TextAlign.center,
-                          onChanged: (value) {
-                            password = value;
-                          },
-                          style: kNameTextStyle,
-                          decoration: kTextFieldDecoration.copyWith(
-                              hintText: 'Enter your password'),
+                        Flexible(
+                          child: TextField(
+                            focusNode: textFieldFocusNode,
+                            obscureText: true,
+                            textAlign: TextAlign.center,
+                            onChanged: (value) {
+                              avatarName = value;
+                            },
+                            style: kNameTextStyle,
+                            decoration: kTextFieldDecoration.copyWith(
+                                hintText: 'Avatar name'),
+                          ),
+                        ),
+                        SizedBox(
+                          height: heightReference / 70,
+                        ),
+                        Flexible(
+                          child: TextField(
+                            focusNode: textFieldFocusNode,
+                            keyboardType: TextInputType.emailAddress,
+                            textAlign: TextAlign.center,
+                            onChanged: (value) {
+                              email = value;
+                            },
+                            style: kNameTextStyle,
+                            decoration: kTextFieldDecoration.copyWith(
+                                hintText: 'Enter your email'),
+                          ),
+                        ),
+                        SizedBox(
+                          height: heightReference / 70,
+                        ),
+                        Flexible(
+                          child: TextField(
+                            focusNode: textFieldFocusNode,
+                            obscureText: true,
+                            textAlign: TextAlign.center,
+                            onChanged: (value) {
+                              password = value;
+                            },
+                            style: kNameTextStyle,
+                            decoration: kTextFieldDecoration.copyWith(
+                                hintText: 'Enter your password'),
+                          ),
                         ),
                         const SizedBox(
                           height: 24.0,
                         ),
-                        RoundedButton(
-                          color: Colors.blueAccent,
-                          title: 'Register',
-                          onPress: () async {
-                            setState(() {
-                              showSpin = true;
-                            });
-                            try {
-                              final newUser =
-                                  await _auth.createUserWithEmailAndPassword(
-                                      email: email, password: password);
-                              if (newUser.user != null) _navigateToChatScreen();
-                              setState(() {
-                                showSpin = false;
-                              });
-                            } catch (e) {
-                              print(e);
-                            }
-                          },
-                        )
                       ],
                     ),
                   ),
                 ),
               ),
+              RoundedButton(
+                color: Color(0xff262626),
+                title: 'Register',
+                onPress: () async {
+                  setState(() {
+                    showSpin = true;
+                  });
+                  try {
+                    final newUser = await _auth.createUserWithEmailAndPassword(
+                        email: email, password: password);
+                    if (newUser.user != null) {
+                      ChatUser user = await _firestore.createUser(
+                          newUser.user!.uid,
+                          firstName,
+                          lastName,
+                          avatarName,
+                          email);
+                      UserManager.instance.initializeUser(newUser.user, user);
+                      _navigateToChatScreen();
+                    }
+                    setState(() {
+                      showSpin = false;
+                    });
+                  } catch (e) {
+                    print(e);
+                  }
+                },
+              )
             ],
           ),
         ),

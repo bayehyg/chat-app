@@ -1,7 +1,10 @@
+import 'package:chat_app/firestore_adapter.dart';
 import 'package:chat_app/screens/background.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
+import '../UserManager.dart';
+import '../components/User.dart';
 import '../components/roundedButton.dart';
 import '../constants.dart';
 import 'chat_screen.dart';
@@ -16,6 +19,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _auth = FirebaseAuth.instance;
+  final _firestore = FirestoreAdapter();
   late var email;
   late var password;
   bool showSpin = false;
@@ -81,7 +85,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     try {
                       final newUser = await _auth.signInWithEmailAndPassword(
                           email: email, password: password);
-                      if (newUser.user != null) _navigateToChatScreen();
+                      if (newUser.user != null) {
+                        ChatUser myUser =
+                            await _firestore.fetchUser(newUser.user!.uid);
+                        UserManager.instance
+                            .initializeUser(newUser.user, myUser);
+                        _navigateToChatScreen();
+                      }
                       setState(() {
                         showSpin = false;
                       });

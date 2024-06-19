@@ -29,6 +29,20 @@ class FirestoreAdapter {
     }
   }
 
+  Future<ChatUser> createUser(String id, String firstName, String lastName,
+      String avatarName, String email) async {
+    DocumentReference userRef = await _firestore.collection('users').doc(id);
+    final data = {
+      'avatarName': avatarName,
+      'email': email,
+      'firstName': firstName,
+      'lastName': lastName,
+      'lastSeen': Timestamp.now(),
+    };
+    userRef.set(data);
+    return ChatUser.fromMap(id, data);
+  }
+
   Future<ChatUser> fetchUserByEmail(String email) async {
     final docRef = _firestore
         .collection('users')

@@ -63,11 +63,11 @@ class _ChatScreenState extends State<ChatScreen> {
       Navigator.pop(context);
       return;
     }
-    firestore.fetchUser(loggedInUser.uid).then((value) {
-      myUser = value;
-      UserManager.instance.initializeUser(loggedInUser, value);
-      return value;
-    });
+    // firestore.fetchUser(loggedInUser.uid).then((value) {
+    //   myUser = value;
+    //   UserManager.instance.initializeUser(loggedInUser, value);
+    //   return value;
+    // });
     itemsMaps = await firestore.initialFetch();
     print(itemsMaps.length);
     itemsMaps.forEach((key, val) {
@@ -84,7 +84,7 @@ class _ChatScreenState extends State<ChatScreen> {
     final items = [];
     await Future.forEach(convosMap.entries,
         (MapEntry<String, dynamic> entry) async {
-      ChatUser myUser = UserManager
+      myUser = UserManager
           .instance.currentChatUser!; // the singleton user i.e the owner
       Map<String, dynamic> thisParticipant = entry.value['participants'][
           0]; // the participant info in the database currently initialized to the first one for search
