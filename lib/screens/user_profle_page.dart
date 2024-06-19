@@ -1,5 +1,7 @@
 import 'package:chat_app/components/User.dart';
 import 'package:chat_app/screens/profile_menu.dart';
+import 'package:chat_app/screens/welcome_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:random_avatar/random_avatar.dart';
@@ -93,54 +95,49 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: 30),
               const Divider(),
               const SizedBox(height: 10),
-
-              /// -- MENU
-              ProfileMenuWidget(
-                  title: "Settings",
-                  icon: LineAwesomeIcons.cog_solid,
-                  onPress: () {}),
-              ProfileMenuWidget(
-                  title: "Billing Details",
-                  icon: LineAwesomeIcons.wallet_solid,
-                  onPress: () {}),
-              ProfileMenuWidget(
-                  title: "User Management",
-                  icon: LineAwesomeIcons.user_check_solid,
-                  onPress: () {}),
-              const Divider(),
-              const SizedBox(height: 10),
-              ProfileMenuWidget(
-                title: "Information",
-                icon: LineAwesomeIcons.info_circle_solid,
-                onPress: () {},
-              ),
               ProfileMenuWidget(
                   title: "Logout",
                   icon: LineAwesomeIcons.sign_out_alt_solid,
                   textColor: Colors.red,
                   endIcon: false,
                   onPress: () {
-                    // Get.defaultDialog(
-                    //   title: "LOGOUT",
-                    //   titleStyle: const TextStyle(fontSize: 20),
-                    //   content: const Padding(
-                    //     padding: EdgeInsets.symmetric(vertical: 15.0),
-                    //     child: Text("Are you sure, you want to Logout?"),
-                    //   ),
-                    //   confirm: Expanded(
-                    //     child: ElevatedButton(
-                    //       onPressed: () {
-                    //         // TODO: implement this
-                    //       },
-                    //       style: ElevatedButton.styleFrom(
-                    //           backgroundColor: Colors.redAccent,
-                    //           side: BorderSide.none),
-                    //       child: const Text("Yes"),
-                    //     ),
-                    //   ),
-                    //   cancel: OutlinedButton(
-                    //       onPressed: () => Get.back(), child: const Text("No")),
-                    // );
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: Text("LOGOUT"),
+                          titleTextStyle: const TextStyle(fontSize: 20),
+                          content: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 15.0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text("Are you sure, you want to Logout?"),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    FirebaseAuth.instance.signOut();
+                                    Navigator.of(context).pushAndRemoveUntil(
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const WelcomeScreen()),
+                                      (Route<dynamic> route) => false,
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.redAccent,
+                                      side: BorderSide.none),
+                                  child: const Text("Yes"),
+                                ),
+                                OutlinedButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(),
+                                    child: const Text("No")),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    );
                   }),
             ],
           ),

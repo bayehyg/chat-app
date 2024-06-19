@@ -3,6 +3,7 @@ import 'package:chat_app/components/bottomNavigation.dart';
 import 'package:chat_app/components/custom_search_bar.dart';
 import 'package:chat_app/firestore_adapter.dart';
 import 'package:chat_app/screens/addUserPage.dart';
+import 'package:chat_app/screens/user_profle_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:chat_app/constants.dart';
@@ -186,7 +187,9 @@ class _ChatScreenState extends State<ChatScreen> {
           IconButton(
               icon: const Icon(CupertinoIcons.gear),
               onPressed: () {
-                //Implement logout functionality
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return ProfileScreen(user: myUser);
+                }));
               }),
         ],
         title: Text('CodeBand',
