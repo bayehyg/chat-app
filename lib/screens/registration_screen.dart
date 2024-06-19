@@ -140,7 +140,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         Flexible(
                           child: TextField(
                             focusNode: textFieldFocusNode,
-                            obscureText: true,
                             textAlign: TextAlign.center,
                             onChanged: (value) {
                               avatarName = value;
