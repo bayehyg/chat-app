@@ -47,17 +47,16 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                 Hero(
                   tag: 'logo',
                   child: SizedBox(
-                    height: animation.value * 100,
+                    height: animation.value * 150,
                     child: Image.asset('images/logo.png'),
                   ),
                 ),
                 const SizedBox(
                   height: 40,
                 ),
-                Text(
-                  ' Flash Chat',
-                  style: kLogoTextStyle,
-                ),
+                Text('CodeBand',
+                    style: kLogoTextStyle.copyWith(
+                        fontSize: 60, color: const Color(0xfff1f1f1))),
               ],
             ),
             SizedBox(

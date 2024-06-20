@@ -12,7 +12,7 @@ class CustomBackground extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           Container(
-            decoration: const BoxDecoration(color: Color(0xff673AB7)),
+            decoration: const BoxDecoration(color: Color(0xff1f0b46)),
           ),
           body,
         ],

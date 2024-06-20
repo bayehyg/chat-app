@@ -65,7 +65,7 @@ class _ChatScreenState extends State<ChatScreen> {
       return;
     }
     myUser = UserManager.instance.currentChatUser!;
-    itemsMaps = await firestore.initialFetch();
+    itemsMaps = await firestore.initialFetch(myUser.id);
     itemsMaps.forEach((key, val) {
       firestore.listenForMessageChanges(key).listen((snapshot) {
         setState(() {});
@@ -100,6 +100,7 @@ class _ChatScreenState extends State<ChatScreen> {
           users.add(user);
         }
       }
+      if (unread > 0) CustomBottomNav.notifications = true;
       if (isjustNotifications && unread < 1) return;
       items.add({
         'convoId': entry.key,

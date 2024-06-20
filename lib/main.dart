@@ -23,6 +23,7 @@ class FlashChat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: kMainThemeData,
       initialRoute: WelcomeScreen.id,
       routes: {

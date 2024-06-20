@@ -89,11 +89,11 @@ class FirestoreAdapter {
     return conversationRef.id;
   }
 
-  Future<Map<String, dynamic>> initialFetch() async {
+  Future<Map<String, dynamic>> initialFetch(String id) async {
     final items = <String, dynamic>{};
     final snapshot = await _firestore
         .collection("conversations")
-        .where("participantIds", arrayContains: "123456789")
+        .where("participantIds", arrayContains: id)
         .get();
 
     for (var doc in snapshot.docs) {

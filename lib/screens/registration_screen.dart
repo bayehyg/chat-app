@@ -64,9 +64,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 padding: EdgeInsets.only(
                     top: heightReference / 15, bottom: heightReference / 20),
                 child: Text(
-                  "sign up",
+                  "Sign up",
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 50, color: Colors.white),
+                  style: TextStyle(
+                      fontSize: 50,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold),
                 ),
               ),
               ModalProgressHUD(
@@ -79,7 +82,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   child: Container(
                     padding: EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                        color: Color(0xff4C2C8D),
+                        color: Color(0xff2e1369),
                         borderRadius: BorderRadius.circular(15)),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -190,7 +193,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 ),
               ),
               RoundedButton(
-                color: Color(0xff262626),
+                color: Color(0xff111111),
                 title: 'Register',
                 onPress: () async {
                   setState(() {

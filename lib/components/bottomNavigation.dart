@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class CustomBottomNav extends StatefulWidget {
+  static bool notifications = false;
   final Function onNotificationsSelected;
   final Function onHomeSelected;
-  const CustomBottomNav(
+  CustomBottomNav(
       {super.key,
       required this.onNotificationsSelected,
       required this.onHomeSelected});
@@ -41,22 +43,24 @@ class _CustomBottomNavState extends State<CustomBottomNav> {
           label: 'Home',
         ),
         NavigationDestination(
-          selectedIcon: NavBadge(
-              icon: Icons.notifications_sharp, label: '', color: Colors.white),
-          icon: NavBadge(
-              icon: Icons.notifications_sharp, label: '', color: Colors.grey),
+          selectedIcon: CustomBottomNav.notifications
+              ? NavBadge(
+                  icon: Icons.notifications_sharp,
+                  color: Colors.white,
+                  label: '',
+                )
+              : const Icon(Icons.notifications_sharp),
+          icon: CustomBottomNav.notifications
+              ? NavBadge(
+                  icon: Icons.notifications_sharp,
+                  color: Colors.grey,
+                  label: '',
+                )
+              : Icon(
+                  Icons.notifications_sharp,
+                  size: MediaQuery.of(context).size.width / 13,
+                ),
           label: 'Notifications',
-        ),
-        NavigationDestination(
-          selectedIcon: NavBadge(
-              icon: CupertinoIcons.chat_bubble_2,
-              label: '2',
-              color: Colors.white),
-          icon: NavBadge(
-              icon: CupertinoIcons.chat_bubble_2,
-              label: '2',
-              color: Colors.grey),
-          label: 'Messages',
         ),
       ],
     );
