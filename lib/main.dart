@@ -1,5 +1,7 @@
+import 'package:chat_app/components/User.dart';
 import 'package:chat_app/constants.dart';
 import 'package:chat_app/screens/addUserPage.dart';
+import 'package:chat_app/screens/group_profile_page.dart';
 import 'package:chat_app/screens/user_profle_page.dart';
 import 'package:flutter/material.dart';
 import 'package:chat_app/screens/welcome_screen.dart';

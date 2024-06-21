@@ -5,6 +5,7 @@ import 'package:chat_app/components/User.dart';
 import 'package:chat_app/components/custom_avatar.dart';
 import 'package:chat_app/constants.dart';
 import 'package:chat_app/firestore_adapter.dart';
+import 'package:chat_app/screens/group_profile_page.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
@@ -321,9 +322,20 @@ class _ChatPageState extends State<ChatPage> {
           padding: const EdgeInsets.fromLTRB(10, 5, 0, 5),
           child: widget.groupName == null
               ? CustomAvatar(user: widget.chatUsers[0])
-              : CircleAvatar(
-                  backgroundColor: Colors.green,
-                  child: Text(widget.groupName![0])),
+              : GestureDetector(
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return GroupProfilePage(
+                        users: widget.chatUsers,
+                        groupName: widget.groupName!,
+                      );
+                    }));
+                  },
+                  child: CircleAvatar(
+                      backgroundColor: Colors.green,
+                      child: Text(widget.groupName![0])),
+                ),
         ),
         title: Text(
             style: kNameTextStyle,
