@@ -24,7 +24,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     super.initState();
     controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 1),
+      duration: const Duration(seconds: 2),
     );
     animation = CurvedAnimation(parent: controller, curve: Curves.decelerate);
     controller.forward();
@@ -62,19 +62,25 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             SizedBox(
               height: animation.value * 48.0,
             ),
-            RoundedButton(
-              color: Colors.lightBlueAccent,
-              title: 'Log in',
-              onPress: () {
-                Navigator.pushNamed(context, LoginScreen.id);
-              },
+            Hero(
+              tag: 'log_in_btn',
+              child: RoundedButton(
+                color: Color(0xffad3c29),
+                title: 'Log in',
+                onPress: () {
+                  Navigator.pushNamed(context, LoginScreen.id);
+                },
+              ),
             ),
-            RoundedButton(
-              color: Colors.blueAccent,
-              title: 'Register',
-              onPress: () {
-                Navigator.pushNamed(context, RegistrationScreen.id);
-              },
+            Hero(
+              tag: 'rgtr_btn',
+              child: RoundedButton(
+                color: Color(0xff1e1d1d),
+                title: 'Register',
+                onPress: () {
+                  Navigator.pushNamed(context, RegistrationScreen.id);
+                },
+              ),
             )
           ],
         ),

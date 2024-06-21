@@ -75,41 +75,44 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(
                 height: 24.0,
               ),
-              RoundedButton(
-                  title: 'Log in',
-                  color: Colors.lightBlueAccent,
-                  onPress: () async {
-                    setState(() {
-                      showSpin = true;
-                    });
-                    try {
-                      final newUser = await _auth.signInWithEmailAndPassword(
-                          email: email, password: password);
-                      if (newUser.user != null) {
-                        ChatUser myUser =
-                            await _firestore.fetchUser(newUser.user!.uid);
-                        UserManager.instance
-                            .initializeUser(newUser.user, myUser);
-                        _navigateToChatScreen();
+              Hero(
+                tag: 'log_in_btn',
+                child: RoundedButton(
+                    title: 'Log in',
+                    color: Color(0xffad3c29),
+                    onPress: () async {
+                      setState(() {
+                        showSpin = true;
+                      });
+                      try {
+                        final newUser = await _auth.signInWithEmailAndPassword(
+                            email: email, password: password);
+                        if (newUser.user != null) {
+                          ChatUser myUser =
+                              await _firestore.fetchUser(newUser.user!.uid);
+                          UserManager.instance
+                              .initializeUser(newUser.user, myUser);
+                          _navigateToChatScreen();
+                        }
+                        setState(() {
+                          showSpin = false;
+                        });
+                      } catch (e) {
+                        debugPrint(e.toString());
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                                'Login failed. Please check your credentials and try again.'),
+                            duration: Duration(seconds: 3),
+                          ),
+                        );
+                      } finally {
+                        setState(() {
+                          showSpin = false;
+                        });
                       }
-                      setState(() {
-                        showSpin = false;
-                      });
-                    } catch (e) {
-                      debugPrint(e.toString());
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                              'Login failed. Please check your credentials and try again.'),
-                          duration: Duration(seconds: 3),
-                        ),
-                      );
-                    } finally {
-                      setState(() {
-                        showSpin = false;
-                      });
-                    }
-                  })
+                    }),
+              )
             ],
           ),
         ),

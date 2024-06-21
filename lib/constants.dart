@@ -43,6 +43,7 @@ const kSendButtonTextStyle = TextStyle(
 );
 
 const kNameTextStyle = TextStyle(
+  color: Colors.white,
   fontWeight: FontWeight.bold,
 );
 
