@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:avatar_stack/positions.dart';
 import 'package:chat_app/UserManager.dart';
+import 'package:chat_app/components/custom_avatar.dart';
 import 'package:chat_app/firestore_adapter.dart';
 import 'package:flutter/material.dart';
 import 'package:avatar_stack/avatar_stack.dart';
@@ -207,28 +208,24 @@ class _AddUserPageState extends State<AddUserPage> {
             ),
           ),
           SizedBox(
-            height: 30,
+            height: 20,
           ),
+          const Divider(),
           //if (users.length > 0)
           Padding(
-            padding: EdgeInsets.only(left: 10),
-            child: SizedBox(
-              height: 300,
-              width: 50,
-              child: WidgetStack(
-                positions: settings,
-                stackedWidgets: [
-                  for (int n = 0; n < users.length; n++)
-                    RandomAvatar(users[n].avatarName, width: 50, height: 50),
-                ],
-                buildInfoWidget: (int surplus) {
-                  return Center(
-                      child: Text(
-                    '+$surplus',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ));
-                },
-              ),
+            padding: EdgeInsets.all(10),
+            child: Column(
+              children: [
+                for (int n = 0; n < users.length; n++)
+                  Column(
+                    children: [
+                      CustomAvatar(user: users[n]),
+                      SizedBox(
+                        height: 10,
+                      )
+                    ],
+                  ),
+              ],
             ),
           ),
         ],

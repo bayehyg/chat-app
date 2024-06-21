@@ -99,7 +99,13 @@ class _GroupProfilePageState extends State<GroupProfilePage> {
               SizedBox(height: heightRef / 50),
               const Divider(),
               SizedBox(height: heightRef / 100),
-              for (ChatUser user in widget.users) CustomAvatar(user: user),
+              for (ChatUser user in widget.users)
+                Column(
+                  children: [
+                    CustomAvatar(user: user),
+                    SizedBox(height: heightRef / 100),
+                  ],
+                ),
             ],
           ),
         ),
