@@ -60,6 +60,8 @@ class _ConversationListState extends State<ConversationList> {
 
   @override
   Widget build(BuildContext context) {
+    double widthRef = MediaQuery.of(context).size.width;
+    double heightRef = MediaQuery.of(context).size.height;
     return InkWell(
       onTap: () {
         Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -80,8 +82,9 @@ class _ConversationListState extends State<ConversationList> {
               child: Row(
                 children: <Widget>[
                   widget.groupName == null
-                      ? RandomAvatar(avatarName, height: 50, width: 50)
+                      ? RandomAvatar(avatarName, width: widthRef / 7)
                       : CircleAvatar(
+                          radius: widthRef / 14,
                           backgroundColor: Colors.green,
                           child: Text(widget.groupName![0]),
                         ),

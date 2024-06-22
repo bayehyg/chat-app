@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:chat_app/components/User.dart';
 import 'package:chat_app/components/custom_avatar.dart';
+import 'package:chat_app/components/group_avatar.dart';
 import 'package:chat_app/constants.dart';
 import 'package:chat_app/firestore_adapter.dart';
 import 'package:chat_app/screens/group_profile_page.dart';
@@ -314,35 +315,17 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     firestore.updateConversationLastRead(widget.conversationId, _user.id);
     final TextEditingController myController = TextEditingController();
+    double heightRef = MediaQuery.of(context).size.height;
+
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor:
-            Color(0xff141414), // Set the background color of the AppBar
-        leading: Padding(
-          padding: const EdgeInsets.fromLTRB(10, 5, 0, 5),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(heightRef * 0.11),
+        child: SafeArea(
           child: widget.groupName == null
               ? CustomAvatar(user: widget.chatUsers[0])
-              : GestureDetector(
-                  onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) {
-                      return GroupProfilePage(
-                        users: widget.chatUsers,
-                        groupName: widget.groupName!,
-                      );
-                    }));
-                  },
-                  child: CircleAvatar(
-                      backgroundColor: Colors.green,
-                      child: Text(widget.groupName![0])),
-                ),
+              : GroupAvatar(
+                  groupName: widget.groupName!, users: widget.chatUsers),
         ),
-        title: Text(
-            style: kNameTextStyle,
-            widget.groupName == null
-                ? "${_thisUsers[0].firstName} ${_thisUsers[0].lastName}"
-                : widget.groupName!), // Replace with the actual user name
-        actions: [],
       ),
       body: Chat(
           messages: _messages,
