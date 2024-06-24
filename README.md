@@ -1,6 +1,6 @@
-# CodeBand
+<img src="images/logo.png" alt="My Profile Image"  style="width: 20%;">
 
-!ChatApp Logo
+# CodeBand
 
 ## Introduction
 
@@ -15,19 +15,23 @@ ChatApp is a real-time messaging application built using Flutter and Firebase. I
 
 ## Screenshots
 
-!Screenshot 1
-!Screenshot 2
+<div style="display: flex; justify-content: space-around;">
+    <img style="width: 25%;" src="images/Screenshot%202024-06-24%20144723.png" alt="My Profile Image">
+    <img style="width: 25%;" src="images/Screenshot%202024-06-19%20152505.png" alt="My Profile Image">
+    <img style="width: 25%;" src="images/Screenshot%202024-06-19%20161345.png" alt="My Profile Image">
+</div>
+
 
 ## Features I am working on
 
   - **Code Chatting:**
-   - Share and edit code live with your team, enhancing collaboration and productivity.
+    Share and edit code live with your team, enhancing collaboration and productivity.
 
    -  **Profile Management:**
-   - Update your profile picture and other details.
+   Update your profile picture and other details.
 
    - **Push notifications**
-   - Instant push notification when any changes happen.
+    Instant push notification when any changes happen.
 
 ## Installation
 
@@ -41,8 +45,8 @@ ChatApp is a real-time messaging application built using Flutter and Firebase. I
 1. **Clone the repository:**
 
     ```bash
-    git clone https://github.com/yourusername/chatapp.git
-    cd chatapp
+    git clone https://github.com/bayehyg/chat-app.git
+    cd chat-app
     ```
 
 2. **Install dependencies:**
@@ -65,7 +69,7 @@ ChatApp is a real-time messaging application built using Flutter and Firebase. I
 
 ## Contact
 
-If you have any questions or suggestions, feel free to open an issue or contact us at bayehyonatan@gmail.com.
+If you have any questions or suggestions, feel free to open an issue or contact me at bayehyonatan@gmail.com.
 
 ---
 
