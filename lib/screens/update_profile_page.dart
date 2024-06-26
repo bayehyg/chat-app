@@ -1,17 +1,22 @@
 // import 'package:flutter/material.dart';
+// import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 //
 // class ProfileScreen extends StatelessWidget {
 //   const ProfileScreen({Key? key}) : super(key: key);
 //
 //   @override
 //   Widget build(BuildContext context) {
+//     double widthRef = MediaQuery.of(context).size.width;
+//     double heightRef = MediaQuery.of(context).size.height;
 //     var isDark = MediaQuery.of(context).platformBrightness == Brightness.dark;
 //     return Scaffold(
 //       appBar: AppBar(
 //         leading: IconButton(
-//             onPressed: () => Get.back(),
-//             icon: const Icon(LineAwesomeIcons.angle_left)),
-//         title: Text(tProfile, style: Theme.of(context).textTheme.headline4),
+//             onPressed: () => (){
+//               Navigator.pop(context);
+//             },
+//             icon: const Icon(LineAwesomeIcons.angle_left_solid)),
+//         title: Text("profile", style: Theme.of(context).textTheme.headlineLarge),
 //         actions: [
 //           IconButton(
 //               onPressed: () {},
@@ -20,7 +25,7 @@
 //       ),
 //       body: SingleChildScrollView(
 //         child: Container(
-//           padding: const EdgeInsets.all(tDefaultSize),
+//           padding: EdgeInsets.all(widthRef / 100),
 //           child: Column(
 //             children: [
 //               /// -- IMAGE
@@ -31,7 +36,7 @@
 //                     height: 120,
 //                     child: ClipRRect(
 //                         borderRadius: BorderRadius.circular(100),
-//                         child: const Image(image: AssetImage(tProfileImage))),
+//                         child: ),
 //                   ),
 //                   Positioned(
 //                     bottom: 0,

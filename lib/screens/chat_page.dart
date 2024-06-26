@@ -299,7 +299,7 @@ class _ChatPageState extends State<ChatPage> {
       id: const Uuid().v4(),
       text: message.text,
     );
-    _addMessage(textMessage);
+    //_addMessage(textMessage);
   }
 
   /// sends a message
