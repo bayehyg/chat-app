@@ -15,7 +15,7 @@ ChatApp is a real-time messaging application built using Flutter and Firebase. I
 
 ## Screenshots
 
-<div style="display: flex; justify-content: center; gap: 40px">
+<div style="display: flex; justify-content: center; gap: 10%x">
     <img style="width: 25%;" src="images/Screenshot%202024-06-24%20144723.png" alt="My Profile Image">
     <img style="width: 25%;" src="images/Screenshot%202024-06-19%20152505.png" alt="My Profile Image">
     <img style="width: 25%;" src="images/Screenshot%202024-06-19%20161345.png" alt="My Profile Image">
